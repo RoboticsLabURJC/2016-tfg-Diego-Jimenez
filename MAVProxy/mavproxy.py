@@ -7,7 +7,6 @@ Released under the GNU GPL version 3 or later
 
 '''
 
-from __future__ import print_function
 import sys, os, time, socket, signal
 import fnmatch, errno, threading
 import serial, Queue, select
@@ -34,11 +33,6 @@ try:
             import pyreadline as readline
 except Exception:
       pass
-
-'''Override print once and for all'''
-def print(*args, **kwargs):
-	__builtins__.print("overriidenn")
-	return __builtins__.print(*args,**kwargs)
 
 if __name__ == '__main__':
       freeze_support()
