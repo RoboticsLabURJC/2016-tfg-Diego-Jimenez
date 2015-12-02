@@ -7,6 +7,7 @@ Released under the GNU GPL version 3 or later
 
 '''
 
+from __future__ import print_function
 import sys, os, time, socket, signal
 import fnmatch, errno, threading
 import serial, Queue, select
@@ -18,6 +19,8 @@ from MAVProxy.modules.lib import textconsole
 from MAVProxy.modules.lib import rline
 from MAVProxy.modules.lib import mp_module
 from MAVProxy.modules.lib import dumpstacks
+from MAVProxy.modules.lib import udp
+from MAVProxy.modules.lib import tcp
 
 # adding all this allows pyinstaller to build a working windows executable
 # note that using --hidden-import does not work for these modules
@@ -31,6 +34,11 @@ try:
             import pyreadline as readline
 except Exception:
       pass
+
+'''Override print once and for all'''
+def print(*args, **kwargs):
+	__builtins__.print("overriidenn")
+	return __builtins__.print(*args,**kwargs)
 
 if __name__ == '__main__':
       freeze_support()
@@ -114,7 +122,9 @@ class MAVFunctions(object):
 class MPState(object):
     '''holds state of mavproxy'''
     def __init__(self):
-        self.console = textconsole.SimpleConsole()
+	self.udp = udp.UdpServer()
+	self.tcp = tcp.TcpServer()
+        self.console = textconsole.SimpleConsole(udp = self.udp, tcp = self.tcp)
         self.map = None
         self.map_functions = {}
         self.vehicle_type = None
@@ -796,14 +806,19 @@ def main_loop():
                     # on an exception, remove it from the select list
                     mpstate.select_extra.pop(fd)
 
-
-
 def input_loop():
     '''wait for user input'''
     while mpstate.status.exit != True:
         try:
             if mpstate.status.exit != True:
-                line = raw_input(mpstate.rl.prompt)
+		 if mpstate.udp.bound():
+                    line = mpstate.udp.readln()
+           	    mpstate.udp.writeln(line)
+		 elif mpstate.tcp.connected():
+                    line = mpstate.tcp.readln()
+           	    mpstate.tcp.writeln(line)
+		 else:
+                    line = raw_input(mpstate.rl.prompt)
         except EOFError:
             mpstate.status.exit = True
             sys.exit(1)
@@ -835,6 +850,8 @@ if __name__ == '__main__':
     parser.add_option("--master", dest="master", action='append',
                       metavar="DEVICE[,BAUD]", help="MAVLink master port and optional baud rate",
                       default=[])
+    parser.add_option("--udp", dest="udp", action='append', help="run udp server")
+    parser.add_option("--tcp", dest="tcp", action='append', help="run tcp server")
     parser.add_option("--out", dest="output", action='append',
                       metavar="DEVICE[,BAUD]", help="MAVLink output port and optional baud rate",
                       default=[])
@@ -903,8 +920,8 @@ if __name__ == '__main__':
     if opts.version:
         import pkg_resources
         version = pkg_resources.require("mavproxy")[0].version
-        print "MAVProxy is a modular ground station using the mavlink protocol"
-        print "MAVProxy Version: " + version
+        print("MAVProxy is a modular ground station using the mavlink protocol")
+        print("MAVProxy Version: " + version)
         sys.exit(1)
     
     # global mavproxy state
@@ -916,6 +933,13 @@ if __name__ == '__main__':
     mpstate.logqueue = Queue.Queue()
     mpstate.logqueue_raw = Queue.Queue()
 
+    if opts.udp:
+	mpstate.udp.connect(opts.udp[0].split(":")[0], int(opts.udp[0].split(":")[1]))
+	print("Connected (UDP) to " + mpstate.udp.address + ":" + str(mpstate.udp.port))
+
+    if opts.tcp:
+	mpstate.tcp.connect(opts.tcp[0].split(":")[0], int(opts.tcp[0].split(":")[1]))
+	print("Client (TCP) connected at " + mpstate.tcp.client[0] + ":" + str(mpstate.tcp.port))
 
     if opts.speech:
         # start the speech-dispatcher early, so it doesn't inherit any ports from
@@ -939,7 +963,7 @@ if __name__ == '__main__':
     def quit_handler(signum = None, frame = None):
         #print 'Signal handler called with signal', signum
         if mpstate.status.exit:
-            print 'Clean shutdown impossible, forcing an exit'
+            print('Clean shutdown impossible, forcing an exit')
             sys.exit(0)
         else:
             mpstate.status.exit = True
