@@ -16,13 +16,10 @@ import shlex
 import math
 import Ice, jderobot
 
-from MAVProxy.modules.lib import textconsole
-from MAVProxy.modules.lib import rline
-from MAVProxy.modules.lib import mp_module
-from MAVProxy.modules.lib import dumpstacks
-from MAVProxy.modules.lib import udp
-from MAVProxy.modules.lib import tcp
-
+from modules.lib import textconsole
+from modules.lib import rline
+from modules.lib import mp_module
+from modules.lib import dumpstacks
 
 from Pose3D import Pose3DI
 from CMDVel import CMDVelI
@@ -60,6 +57,7 @@ class MPStatus(object):
         self.exit = False
         self.flightmode = 'MAV'
         self.last_mode_announce = 0
+        self.last_mode_announced = 'MAV'
         self.logdir = None
         self.last_heartbeat = 0
         self.last_message = 0
@@ -124,18 +122,16 @@ class MAVFunctions(object):
 class MPState(object):
     '''holds state of mavproxy'''
     def __init__(self):
-	self.udp = udp.UdpServer()
-	self.tcp = tcp.TcpServer()
-        self.console = textconsole.SimpleConsole(udp = self.udp, tcp = self.tcp)
+        self.console = textconsole.SimpleConsole()
         self.map = None
         self.map_functions = {}
         self.vehicle_type = None
         self.vehicle_name = None
-        from MAVProxy.modules.lib.mp_settings import MPSettings, MPSetting
+        from modules.lib.mp_settings import MPSettings, MPSetting
         self.settings = MPSettings(
             [ MPSetting('link', int, 1, 'Primary Link', tab='Link', range=(0,4), increment=1),
-              MPSetting('streamrate', int, 4, 'Stream rate link1', range=(-1,20), increment=1),
-              MPSetting('streamrate2', int, 4, 'Stream rate link2', range=(-1,20), increment=1),
+              MPSetting('streamrate', int, 4, 'Stream rate link1', range=(-1,100), increment=1),
+              MPSetting('streamrate2', int, 4, 'Stream rate link2', range=(-1,100), increment=1),
               MPSetting('heartbeat', int, 1, 'Heartbeat rate', range=(0,5), increment=1),
               MPSetting('mavfwd', bool, True, 'Allow forwarded control'),
               MPSetting('mavfwd_rate', bool, False, 'Allow forwarded rate control'),
@@ -165,7 +161,8 @@ class MPState(object):
               MPSetting('source_component', int, 0, 'MAVLink Source component', range=(0,255), increment=1),
               MPSetting('target_system', int, 0, 'MAVLink target system', range=(0,255), increment=1),
               MPSetting('target_component', int, 0, 'MAVLink target component', range=(0,255), increment=1),
-              MPSetting('state_basedir', str, None, 'base directory for logs and aircraft directories')
+              MPSetting('state_basedir', str, None, 'base directory for logs and aircraft directories'),
+              MPSetting('allow_unsigned', bool, True, 'whether unsigned packets will be accepted')
             ])
 
         self.completions = {
@@ -211,6 +208,7 @@ class MPState(object):
               return None
         if self.settings.link > len(self.mav_master):
             self.settings.link = 1
+
         # try to use one with no link error
         if not self.mav_master[self.settings.link-1].linkerror:
             return self.mav_master[self.settings.link-1]
@@ -218,7 +216,6 @@ class MPState(object):
             if not m.linkerror:
                 return m
         return self.mav_master[self.settings.link-1]
-
 
 def get_mav_param(param, default=None):
     '''return a EEPROM parameter value'''
@@ -425,6 +422,14 @@ command_map = {
     'alias'   : (cmd_alias,    'command aliases')
     }
 
+def shlex_quotes(value):
+    '''see http://stackoverflow.com/questions/6868382/python-shlex-split-ignore-single-quotes'''
+    lex = shlex.shlex(value)
+    lex.quotes = '"'
+    lex.whitespace_split = True
+    lex.commenters = ''
+    return list(lex)
+
 def process_stdin(line):
     '''handle commands from user'''
     if line is None:
@@ -454,8 +459,9 @@ def process_stdin(line):
     if not line:
         return
 
-    args = shlex.split(line)
+    args = shlex_quotes(line)
     cmd = args[0]
+
     while cmd in mpstate.aliases:
         line = mpstate.aliases[cmd]
         args = shlex.split(line) + args[1:]
@@ -589,11 +595,14 @@ def log_writer():
 def log_paths():
     '''Returns tuple (logdir, telemetry_log_filepath, raw_telemetry_log_filepath)'''
     if opts.aircraft is not None:
+        dirname = ""
+        if(opts.daemon):
+            dirname = '/var/log/'
         if opts.mission is not None:
             print(opts.mission)
-            dirname = "%s/logs/%s/Mission%s" % (opts.aircraft, time.strftime("%Y-%m-%d"), opts.mission)
+            dirname += "%s/logs/%s/Mission%s" % (opts.aircraft, time.strftime("%Y-%m-%d"), opts.mission)
         else:
-            dirname = "%s/logs/%s" % (opts.aircraft, time.strftime("%Y-%m-%d"))
+            dirname += "%s/logs/%s" % (opts.aircraft, time.strftime("%Y-%m-%d"))
         # dirname is currently relative.  Possibly add state_basedir:
         if mpstate.settings.state_basedir is not None:
             dirname = os.path.join(mpstate.settings.state_basedir,dirname)
@@ -616,7 +625,11 @@ def log_paths():
         dir_path = os.path.dirname(opts.logfile)
         if not os.path.isabs(dir_path) and mpstate.settings.state_basedir is not None:
             dir_path = os.path.join(mpstate.settings.state_basedir,dir_path)
-        logdir = dir_path
+
+        if(opts.daemon):
+            logdir = '/var/log'
+        else:
+            logdir = dir_path
 
     mkdir_p(logdir)
     return (logdir,
@@ -630,17 +643,31 @@ def open_telemetry_logs(logpath_telem, logpath_telem_raw):
         mode = 'a'
     else:
         mode = 'w'
-    mpstate.logfile = open(logpath_telem, mode=mode)
-    mpstate.logfile_raw = open(logpath_telem_raw, mode=mode)
-    print("Log Directory: %s" % mpstate.status.logdir)
-    print("Telemetry log: %s" % logpath_telem)
 
-    # use a separate thread for writing to the logfile to prevent
-    # delays during disk writes (important as delays can be long if camera
-    # app is running)
-    t = threading.Thread(target=log_writer, name='log_writer')
-    t.daemon = True
-    t.start()
+    try:
+        mpstate.logfile = open(logpath_telem, mode=mode)
+        mpstate.logfile_raw = open(logpath_telem_raw, mode=mode)
+        print("Log Directory: %s" % mpstate.status.logdir)
+        print("Telemetry log: %s" % logpath_telem)
+
+        #make sure there's enough free disk space for the logfile (>200Mb)
+        stat = os.statvfs(logpath_telem)
+        if stat.f_bfree*stat.f_bsize < 209715200:
+            print("ERROR: Not enough free disk space for logfile")
+            mpstate.status.exit = True
+            return
+
+        # use a separate thread for writing to the logfile to prevent
+        # delays during disk writes (important as delays can be long if camera
+        # app is running)
+        t = threading.Thread(target=log_writer, name='log_writer')
+        t.daemon = True
+        t.start()
+    except Exception as e:
+        print("ERROR: opening log file for writing: %s" % e)
+        mpstate.status.exit = True
+        return
+
 
 def set_stream_rates():
     '''set mavlink stream rates'''
@@ -729,10 +756,8 @@ def main_loop():
         set_stream_rates()
 
     while True:
-
         if mpstate is None or mpstate.status.exit:
             return
-        #cmd
         while not mpstate.input_queue.empty():
             line = mpstate.input_queue.get()
             mpstate.input_count += 1
@@ -791,7 +816,7 @@ def main_loop():
             for sysid in mpstate.sysid_outputs:
                 m = mpstate.sysid_outputs[sysid]
                 if fd == m.fd:
-                    #rocess_mavlink(m)
+                    process_mavlink(m)
                     if mpstate is None:
                           return
                     continue
@@ -809,7 +834,8 @@ def main_loop():
                     # on an exception, remove it from the select list
                     mpstate.select_extra.pop(fd)
 
-            ########################## Jorge Cano CODE ##########################
+
+	########################## Jorge Cano CODE ##########################
 
         Rollvalue = mpstate.status.msgs['ATTITUDE'].roll    #rad
         Pitchvalue = mpstate.status.msgs['ATTITUDE'].pitch  #rad
@@ -841,19 +867,13 @@ def main_loop():
 
         #####################################################################
 
+
 def input_loop():
     '''wait for user input'''
     while mpstate.status.exit != True:
         try:
             if mpstate.status.exit != True:
-		 if mpstate.udp.bound():
-                    line = mpstate.udp.readln()
-           	    mpstate.udp.writeln(line)
-		 elif mpstate.tcp.connected():
-                    line = mpstate.tcp.readln()
-           	    mpstate.tcp.writeln(line)
-		 else:
-                    line = raw_input(mpstate.rl.prompt)
+                line = raw_input(mpstate.rl.prompt)
         except EOFError:
             mpstate.status.exit = True
             sys.exit(1)
@@ -1228,6 +1248,7 @@ def qInverse(q1):
 
 #####################################################################
 
+
 if __name__ == '__main__':
     from optparse import OptionParser
     parser = OptionParser("mavproxy.py [options]")
@@ -1235,8 +1256,6 @@ if __name__ == '__main__':
     parser.add_option("--master", dest="master", action='append',
                       metavar="DEVICE[,BAUD]", help="MAVLink master port and optional baud rate",
                       default=[])
-    parser.add_option("--udp", dest="udp", action='append', help="run udp server")
-    parser.add_option("--tcp", dest="tcp", action='append', help="run tcp server")
     parser.add_option("--out", dest="output", action='append',
                       metavar="DEVICE[,BAUD]", help="MAVLink output port and optional baud rate",
                       default=[])
@@ -1277,6 +1296,7 @@ if __name__ == '__main__':
         default=[],
         help='Load the specified module. Can be used multiple times, or with a comma separated list')
     parser.add_option("--mav09", action='store_true', default=False, help="Use MAVLink protocol 0.9")
+    parser.add_option("--mav20", action='store_true', default=False, help="Use MAVLink protocol 2.0")
     parser.add_option("--auto-protocol", action='store_true', default=False, help="Auto detect MAVLink protocol version")
     parser.add_option("--nowait", action='store_true', default=False, help="don't wait for HEARTBEAT on startup")
     parser.add_option("-c", "--continue", dest='continue_mode', action='store_true', default=False, help="continue logs")
@@ -1288,7 +1308,7 @@ if __name__ == '__main__':
     parser.add_option("--profile", action='store_true', help="run the Yappi python profiler")
     parser.add_option("--state-basedir", default=None, help="base directory for logs and aircraft directories")
     parser.add_option("--version", action='store_true', help="version information")
-    parser.add_option("--default-modules", default="log,wp,rally,fence,param,relay,tuneopt,arm,mode,calibration,rc,auxopt,misc,cmdlong,battery,terrain,output", help='default module list')
+    parser.add_option("--default-modules", default="log,signing,wp,rally,fence,param,relay,tuneopt,arm,mode,calibration,rc,auxopt,misc,cmdlong,battery,terrain,output,adsb", help='default module list')
 
     (opts, args) = parser.parse_args()
 
@@ -1298,6 +1318,8 @@ if __name__ == '__main__':
 
     if opts.mav09:
         os.environ['MAVLINK09'] = '1'
+    if opts.mav20:
+        os.environ['MAVLINK20'] = '1'
     from pymavlink import mavutil, mavparm
     mavutil.set_dialect(opts.dialect)
 
@@ -1305,8 +1327,8 @@ if __name__ == '__main__':
     if opts.version:
         import pkg_resources
         version = pkg_resources.require("mavproxy")[0].version
-        print("MAVProxy is a modular ground station using the mavlink protocol")
-        print("MAVProxy Version: " + version)
+        print "MAVProxy is a modular ground station using the mavlink protocol"
+        print "MAVProxy Version: " + version
         sys.exit(1)
 
     # global mavproxy state
@@ -1318,13 +1340,6 @@ if __name__ == '__main__':
     mpstate.logqueue = Queue.Queue()
     mpstate.logqueue_raw = Queue.Queue()
 
-    if opts.udp:
-	mpstate.udp.connect(opts.udp[0].split(":")[0], int(opts.udp[0].split(":")[1]))
-	print("Connected (UDP) to " + mpstate.udp.address + ":" + str(mpstate.udp.port))
-
-    if opts.tcp:
-	mpstate.tcp.connect(opts.tcp[0].split(":")[0], int(opts.tcp[0].split(":")[1]))
-	print("Client (TCP) connected at " + mpstate.tcp.client[0] + ":" + str(mpstate.tcp.port))
 
     if opts.speech:
         # start the speech-dispatcher early, so it doesn't inherit any ports from
@@ -1348,7 +1363,7 @@ if __name__ == '__main__':
     def quit_handler(signum = None, frame = None):
         #print 'Signal handler called with signal', signum
         if mpstate.status.exit:
-            print('Clean shutdown impossible, forcing an exit')
+            print 'Clean shutdown impossible, forcing an exit'
             sys.exit(0)
         else:
             mpstate.status.exit = True
@@ -1381,7 +1396,7 @@ if __name__ == '__main__':
           mpstate.module('link').link_add(serial_list[0].device)
     elif not opts.master:
           wifi_device = '0.0.0.0:14550'
-          mpstate.module('link').link_add(wifi_device)
+          #mpstate.module('link').link_add(wifi_device)
 
 
     # open any mavlink output ports
@@ -1415,7 +1430,6 @@ if __name__ == '__main__':
         standard_modules = opts.default_modules.split(',')
         for m in standard_modules:
             load_module(m, quiet=True)
-
     if opts.console:
         process_stdin('module load console')
 
@@ -1455,6 +1469,8 @@ if __name__ == '__main__':
 
     # log all packets from the master, for later replay
     open_telemetry_logs(logpath_telem, logpath_telem_raw)
+
+
 
     ########################## Jorge Cano CODE ##########################
 
