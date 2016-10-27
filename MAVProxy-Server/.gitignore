@@ -1,0 +1,16 @@
+mavproxy
+*~
+*.o
+*.pyc
+*.log
+camera/
+build/
+dist/
+gtest/
+*.tlog
+*.raw
+MANIFEST
+*.egg-info
+.DS_Store
+*.bak
+*.orig
