@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 ##MAVProxy
 
 This is a MAVLink ground station written in python. 
@@ -50,3 +51,6 @@ MAVProxy is released under the GNU General Public License v3 or later
 MAVProxy-Server is released under the GNU General Public License v3 or later
 
 [![Gitter](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/Dronecode/MAVProxy?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
+=======
+# 2016-tfg-Diego-Jimenez
+>>>>>>> b6e37d7746bf531b3fb8b4cc3650341657edeafd
