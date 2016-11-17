@@ -26,7 +26,7 @@ class CmdlongModule(mp_module.MPModule):
         if ( len(args) != 1):
             print("Usage: takeoff ALTITUDE_IN_METERS")
             return
-        
+
         if (len(args) == 1):
             altitude = float(args[0])
             print("Take Off started")
@@ -69,7 +69,7 @@ class CmdlongModule(mp_module.MPModule):
 
     def cmd_camctrlmsg(self, args):
         '''camctrlmsg'''
-        
+
         print("Sent DIGICAM_CONFIGURE CMD_LONG")
         self.master.mav.command_long_send(
             self.settings.target_system,  # target_system
@@ -86,7 +86,7 @@ class CmdlongModule(mp_module.MPModule):
 
     def cmd_cammsg(self, args):
         '''cammsg'''
-  
+
         print("Sent DIGICAM_CONTROL CMD_LONG")
         self.master.mav.command_long_send(
             self.settings.target_system,  # target_system
@@ -106,7 +106,7 @@ class CmdlongModule(mp_module.MPModule):
         if ( len(args) != 1):
             print("Usage: speed SPEED_VALUE")
             return
-        
+
         if (len(args) == 1):
             speed = float(args[0])
             print("SPEED %s" % (str(speed)))
@@ -128,7 +128,7 @@ class CmdlongModule(mp_module.MPModule):
         if ( len(args) != 3):
             print("Usage: yaw ANGLE ANGULAR_SPEED MODE:[0 absolute / 1 relative]")
             return
-        
+
         if (len(args) == 3):
             angle = float(args[0])
             angular_speed = float(args[1])
@@ -225,11 +225,11 @@ class CmdlongModule(mp_module.MPModule):
         except Exception:
             pass
         if latlon is None:
-            print "set latlon to zeros"
+            print ("set latlon to zeros")
             latlon = [0, 0]
         else:
             ignoremask = ignoremask & 504
-            print "found latlon", ignoremask            
+            print ("found latlon", ignoremask)
         vN = 0
         vE = 0
         vD = 0
@@ -239,8 +239,8 @@ class CmdlongModule(mp_module.MPModule):
             vD = float(args[2])
             ignoremask = ignoremask & 455
 
-        print "ignoremask",ignoremask
-        print latlon
+        print ("ignoremask",ignoremask)
+        print (latlon)
         self.master.mav.set_position_target_global_int_send(
             0,  # system time in ms
             1,  # target system

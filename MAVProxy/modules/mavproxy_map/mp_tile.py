@@ -51,7 +51,7 @@ TILE_SERVICES = {
 	"OpenAerialMap"  : "http://tile.openaerialmap.org/tiles/?v=mgm&layer=openaerialmap-900913&x=${X}&y=${Y}&zoom=${OAM_ZOOM}",
 	"OpenCycleMap"   : "http://andy.sandbox.cloudmade.com/tiles/cycle/${ZOOM}/${X}/${Y}.png",
 	"StatKartTopo2" : "http://opencache.statkart.no/gatekeeper/gk/gk.open_gmaps?layers=topo2&zoom=${ZOOM}&x=${X}&y=${Y}"
-        
+
 	}
 
 # these are the md5sums of "unavailable" tiles
@@ -91,7 +91,7 @@ class TileInfo:
 		self.tile = tile
 		(self.x, self.y) = tile
 		self.zoom = zoom
-                self.service = service
+		self.service = service
 		(self.offsetx, self.offsety) = offset
 		self.refresh_time()
 
@@ -162,7 +162,7 @@ class MPTile:
 	def __init__(self, cache_path=None, download=True, cache_size=500,
 		     service="MicrosoftSat", tile_delay=0.3, debug=False,
 		     max_zoom=19, refresh_age=30*24*60*60):
-		
+
 		if cache_path is None:
 			try:
 				cache_path = os.path.join(os.environ['HOME'], '.tilecache')
@@ -181,7 +181,7 @@ class MPTile:
 		self.tile_delay = tile_delay
 		self.service = service
 		self.debug = debug
-                self.refresh_age = refresh_age
+		self.refresh_age = refresh_age
 
 		if service not in TILE_SERVICES:
 			raise TileException('unknown tile service %s' % service)
@@ -189,7 +189,7 @@ class MPTile:
 		# _download_pending is a dictionary of TileInfo objects
 		self._download_pending = {}
 		self._download_thread = None
-                self._loading = mp_icon('loading.jpg')
+		self._loading = mp_icon('loading.jpg')
 		self._unavailable = mp_icon('unavailable.jpg')
 		try:
 			self._tile_cache = collections.OrderedDict()
@@ -199,23 +199,19 @@ class MPTile:
 			import ordereddict
 			self._tile_cache = ordereddict.OrderedDict()
 
-        def set_service(self, service):
-                '''set tile service'''
-                self.service = service
+	def set_service(self, service):
+		self.service = service
 
-        def get_service(self):
-                '''get tile service'''
-                return self.service
+	def get_service(self):
+		return self.service
 
-        def get_service_list(self):
-                '''return list of available services'''
-                service_list = TILE_SERVICES.keys()
-                service_list.sort()
-                return service_list
+	def get_service_list(self):
+		service_list = TILE_SERVICES.keys()
+		service_list.sort()
+		return service_list
 
-        def set_download(self, download):
-                '''set download enable'''
-                self.download = download
+	def set_download(self, download):
+		self.download = download
 
 	def coord_to_tile(self, lat, lon, zoom):
 		'''convert lat/lon/zoom to a TileInfo'''
@@ -263,22 +259,22 @@ class MPTile:
 			try:
 				if self.debug:
 					print("Downloading %s [%u left]" % (url, len(keys)))
-                                req = urllib2.Request(url)
-                                if url.find('google') != -1:
-                                        req.add_header('Referer', 'https://maps.google.com/')
+					req = urllib2.Request(url)
+					if url.find('google') != -1:
+						req.add_header('Referer', 'https://maps.google.com/')
 				resp = urllib2.urlopen(req)
 				headers = resp.info()
 			except urllib2.URLError as e:
 				#print('Error loading %s' % url)
-                                if not key in self._tile_cache:
-                                        self._tile_cache[key] = self._unavailable
+				if not key in self._tile_cache:
+					self._tile_cache[key] = self._unavailable
 				self._download_pending.pop(key)
 				if self.debug:
 					print("Failed %s: %s" % (url, str(e)))
 				continue
 			if 'content-type' not in headers or headers['content-type'].find('image') == -1:
-                                if not key in self._tile_cache:
-                                        self._tile_cache[key] = self._unavailable
+				if not key in self._tile_cache:
+					self._tile_cache[key] = self._unavailable
 				self._download_pending.pop(key)
 				if self.debug:
 					print("non-image response %s" % url)
@@ -291,8 +287,8 @@ class MPTile:
 			if md5 in BLANK_TILES:
 				if self.debug:
 					print("blank tile %s" % url)
-                                if not key in self._tile_cache:
-                                        self._tile_cache[key] = self._unavailable
+					if not key in self._tile_cache:
+						self._tile_cache[key] = self._unavailable
 				self._download_pending.pop(key)
 				continue
 
@@ -300,13 +296,13 @@ class MPTile:
 			h = open(path+'.tmp','wb')
 			h.write(img)
 			h.close()
-                        try:
-                                os.unlink(path)
-                        except Exception:
-                                pass
-                        os.rename(path+'.tmp', path)
+			try:
+				os.unlink(path)
+			except Exception:
+				pass
+			os.rename(path+'.tmp', path)
 			self._download_pending.pop(key)
-		self._download_thread = None
+			self._download_thread = None
 
 	def start_download_thread(self):
 		'''start the downloader'''
@@ -356,16 +352,16 @@ class MPTile:
 					continue
 
 			# copy out the quadrant we want
-                        availx = min(TILES_WIDTH - tile_info.offsetx, width2)
-                        availy = min(TILES_HEIGHT - tile_info.offsety, height2)
-                        if availx != width2 or availy != height2:
-                                continue
+			availx = min(TILES_WIDTH - tile_info.offsetx, width2)
+			availy = min(TILES_HEIGHT - tile_info.offsety, height2)
+			if availx != width2 or availy != height2:
+				continue
 			cv.SetImageROI(img, (tile_info.offsetx, tile_info.offsety, width2, height2))
 			img2 = cv.CreateImage((width2,height2), 8, 3)
-                        try:
-                            cv.Copy(img, img2)
-                        except Exception:
-                            continue
+			try:
+				cv.Copy(img, img2)
+			except Exception:
+				continue
 			cv.ResetImageROI(img)
 
 			# and scale it
@@ -392,14 +388,13 @@ class MPTile:
 		path = self.tile_to_path(tile)
 		try:
 			ret = cv.LoadImage(path)
-
-                        # if it is an old tile, then try to refresh
-                        if os.path.getmtime(path) + self.refresh_age < time.time():
-                                try:
-                                        self._download_pending[key].refresh_time()
-                                except Exception:
-                                        self._download_pending[key] = tile
-                                self.start_download_thread()
+			# if it is an old tile, then try to refresh
+			if os.path.getmtime(path) + self.refresh_age < time.time():
+				try:
+					self._download_pending[key].refresh_time()
+				except Exception:
+					self._download_pending[key] = tile
+					self.start_download_thread()
 			# add it to the tile cache
 			self._tile_cache[key] = ret
 			while len(self._tile_cache) > self.cache_size:
@@ -603,7 +598,7 @@ if __name__ == "__main__":
 		lon = bounds[1]
 		ground_width = max(mp_util.gps_distance(lat, lon, lat, lon+bounds[3]),
 				   mp_util.gps_distance(lat, lon, lat-bounds[2], lon))
-		print lat, lon, ground_width
+		print (lat, lon, ground_width)
 
 	mt = MPTile(debug=opts.debug, service=opts.service,
 		    tile_delay=opts.delay, max_zoom=opts.max_zoom)

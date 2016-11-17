@@ -124,8 +124,8 @@ class MAVFunctions(object):
 class MPState(object):
     '''holds state of mavproxy'''
     def __init__(self):
-	self.udp = udp.UdpServer()
-	self.tcp = tcp.TcpServer()
+        self.udp = udp.UdpServer()
+        self.tcp = tcp.TcpServer()
         self.console = textconsole.SimpleConsole(udp = self.udp, tcp = self.tcp)
         self.map = None
         self.map_functions = {}
@@ -846,13 +846,13 @@ def input_loop():
     while mpstate.status.exit != True:
         try:
             if mpstate.status.exit != True:
-		 if mpstate.udp.bound():
+                if mpstate.udp.bound():
                     line = mpstate.udp.readln()
-           	    mpstate.udp.writeln(line)
-		 elif mpstate.tcp.connected():
+                    mpstate.udp.writeln(line)
+                elif mpstate.tcp.connected():
                     line = mpstate.tcp.readln()
-           	    mpstate.tcp.writeln(line)
-		 else:
+                    mpstate.tcp.writeln(line)
+                else:
                     line = raw_input(mpstate.rl.prompt)
         except EOFError:
             mpstate.status.exit = True
@@ -1037,7 +1037,7 @@ def sendCMDVel2Vehicle(CMDVel,Pose3D):
 
         # print velocitystring
 
-        print 'CMDVel :'
+        print ('CMDVel :')
         process_stdin(velocitystring)  # SET_POSITION_TARGET_LOCAL_NED
 
 def sendWayPoint2Vehicle(Pose3D):
@@ -1066,14 +1066,14 @@ def landDecision(CMDVel):
         time.sleep(1)
         command = CMDVel.getCMDVelData()
         if (command.linearZ == -1):
-            print'Lading decision: True'
+            print ('Lading decision: True')
             process_stdin('mode land')
 
             while (command.linearZ == -1):
                 time.sleep(1)
                 command = CMDVel.getCMDVelData()
 
-            print'Target Lost, recovering trajectory'
+            print ('Target Lost, recovering trajectory')
             process_stdin('mode guided')
 
 def global2cartesian(poseLatLonHei):
@@ -1319,12 +1319,12 @@ if __name__ == '__main__':
     mpstate.logqueue_raw = Queue.Queue()
 
     if opts.udp:
-	mpstate.udp.connect(opts.udp[0].split(":")[0], int(opts.udp[0].split(":")[1]))
-	print("Connected (UDP) to " + mpstate.udp.address + ":" + str(mpstate.udp.port))
+        mpstate.udp.connect(opts.udp[0].split(":")[0], int(opts.udp[0].split(":")[1]))
+        print("Connected (UDP) to " + mpstate.udp.address + ":" + str(mpstate.udp.port))
 
     if opts.tcp:
-	mpstate.tcp.connect(opts.tcp[0].split(":")[0], int(opts.tcp[0].split(":")[1]))
-	print("Client (TCP) connected at " + mpstate.tcp.client[0] + ":" + str(mpstate.tcp.port))
+        mpstate.tcp.connect(opts.tcp[0].split(":")[0], int(opts.tcp[0].split(":")[1]))
+        print("Client (TCP) connected at " + mpstate.tcp.client[0] + ":" + str(mpstate.tcp.port))
 
     if opts.speech:
         # start the speech-dispatcher early, so it doesn't inherit any ports from

@@ -17,7 +17,7 @@ class Pose3DI(jderobot.Pose3D):
         self.q2 = _q2
         self.q3 = _q3
 
-        print "Pose3D start"
+        print ("Pose3D start")
 
     def setPose3DData(self, data, current=None):
 

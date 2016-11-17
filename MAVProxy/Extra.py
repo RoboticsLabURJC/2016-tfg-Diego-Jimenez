@@ -9,7 +9,7 @@ class ExtraI(jderobot.ArDroneExtra):
 
     def __init__(self):
 
-        print "Extra start"
+        print ("Extra start")
         self.landDecision = False
         self.takeOffDecision = False
 

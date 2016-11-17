@@ -1057,7 +1057,7 @@ def sendCMDVel2Vehicle(CMDVel,Pose3D):
 
         # print velocitystring
 
-        print 'CMDVel :'
+        print ('CMDVel :')
         process_stdin(velocitystring)  # SET_POSITION_TARGET_LOCAL_NED
 
 def sendWayPoint2Vehicle(Pose3D):
@@ -1086,14 +1086,14 @@ def landDecision(CMDVel):
         time.sleep(1)
         command = CMDVel.getCMDVelData()
         if (command.linearZ == -1):
-            print'Lading decision: True'
+            print ('Lading decision: True')
             process_stdin('mode land')
 
             while (command.linearZ == -1):
                 time.sleep(1)
                 command = CMDVel.getCMDVelData()
 
-            print'Target Lost, recovering trajectory'
+            print ('Target Lost, recovering trajectory')
             process_stdin('mode guided')
 
 def global2cartesian(poseLatLonHei):
@@ -1327,8 +1327,8 @@ if __name__ == '__main__':
     if opts.version:
         import pkg_resources
         version = pkg_resources.require("mavproxy")[0].version
-        print "MAVProxy is a modular ground station using the mavlink protocol"
-        print "MAVProxy Version: " + version
+        print ("MAVProxy is a modular ground station using the mavlink protocol")
+        print ("MAVProxy Version: " + version)
         sys.exit(1)
 
     # global mavproxy state
@@ -1363,7 +1363,7 @@ if __name__ == '__main__':
     def quit_handler(signum = None, frame = None):
         #print 'Signal handler called with signal', signum
         if mpstate.status.exit:
-            print 'Clean shutdown impossible, forcing an exit'
+            print ('Clean shutdown impossible, forcing an exit')
             sys.exit(0)
         else:
             mpstate.status.exit = True

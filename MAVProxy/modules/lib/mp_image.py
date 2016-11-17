@@ -531,9 +531,9 @@ if __name__ == "__main__":
             if isinstance(event, MPMenuItem):
                 print(event)
                 continue
-            print event.ClassName
+            print (event.ClassName)
             if event.ClassName == 'wxMouseEvent':
-                print 'mouse', event.X, event.Y
+                print ('mouse', event.X, event.Y)
             if event.ClassName == 'wxKeyEvent':
-                print 'key %u' % event.KeyCode
+                print ('key %u' % event.KeyCode)
         time.sleep(0.1)

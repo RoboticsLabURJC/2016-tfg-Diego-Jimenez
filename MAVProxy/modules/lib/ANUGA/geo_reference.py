@@ -90,16 +90,16 @@ class Geo_reference:
         self.units = units
         self.xllcorner = float(xllcorner)
         self.yllcorner = float(yllcorner)
-            
+
         if NetCDFObject is not None:
             self.read_NetCDF(NetCDFObject)
 
         if ASCIIFile is not None:
             self.read_ASCII(ASCIIFile, read_title=read_title)
-            
-        # Set flag for absolute points (used by get_absolute)    
+
+        # Set flag for absolute points (used by get_absolute)
         self.absolute = num.allclose([self.xllcorner, self.yllcorner], 0)
-            
+
 
     def get_xllcorner(self):
         return self.xllcorner
@@ -148,30 +148,30 @@ class Geo_reference:
             pass
 
         if self.false_easting != DEFAULT_FALSE_EASTING:
-            print "WARNING: False easting of %f specified." % self.false_easting
-            print "Default false easting is %f." % DEFAULT_FALSE_EASTING
-            print "ANUGA does not correct for differences in False Eastings."
+            print ("WARNING: False easting of %f specified." % self.false_easting)
+            print ("Default false easting is %f." % DEFAULT_FALSE_EASTING)
+            print ("ANUGA does not correct for differences in False Eastings.")
 
         if self.false_northing != DEFAULT_FALSE_NORTHING:
             print ("WARNING: False northing of %f specified."
                    % self.false_northing)
-            print "Default false northing is %f." % DEFAULT_FALSE_NORTHING
-            print "ANUGA does not correct for differences in False Northings."
+            print ("Default false northing is %f." % DEFAULT_FALSE_NORTHING)
+            print ("ANUGA does not correct for differences in False Northings.")
 
         if self.datum.upper() != DEFAULT_DATUM.upper():
-            print "WARNING: Datum of %s specified." % self.datum
-            print "Default Datum is %s." % DEFAULT_DATUM
-            print "ANUGA does not correct for differences in datums."
+            print ("WARNING: Datum of %s specified." % self.datum)
+            print ("Default Datum is %s." % DEFAULT_DATUM)
+            print ("ANUGA does not correct for differences in datums.")
 
         if self.projection.upper() != DEFAULT_PROJECTION.upper():
-            print "WARNING: Projection of %s specified." % self.projection
-            print "Default Projection is %s." % DEFAULT_PROJECTION
-            print "ANUGA does not correct for differences in Projection."
+            print ("WARNING: Projection of %s specified." % self.projection)
+            print ("Default Projection is %s." % DEFAULT_PROJECTION)
+            print ("ANUGA does not correct for differences in Projection.")
 
         if self.units.upper() != DEFAULT_UNITS.upper():
-            print "WARNING: Units of %s specified." % self.units
-            print "Default units is %s." % DEFAULT_UNITS
-            print "ANUGA does not correct for differences in units."
+            print ("WARNING: Units of %s specified." % self.units)
+            print ("Default units is %s." % DEFAULT_UNITS)
+            print ("ANUGA does not correct for differences in units.")
 
 ################################################################################
 # ASCII files with geo-refs are currently not used
@@ -196,13 +196,13 @@ class Geo_reference:
             if read_title[0:2].upper() != TITLE[0:2].upper():
                 msg = ('File error.  Expecting line: %s.  Got this line: %s'
                        % (TITLE, read_title))
-                raise TitleError, msg
+                raise TitleError(msg)
             self.zone = int(fd.readline())
             self.xllcorner = float(fd.readline())
             self.yllcorner = float(fd.readline())
         except SyntaxError:
             msg = 'File error.  Got syntax error while parsing geo reference'
-            raise ParsingError, msg
+            raise ParsingError(msg)
 
         # Fix some assertion failures
         if isinstance(self.zone, num.ndarray) and self.zone.shape == ():
@@ -232,13 +232,13 @@ class Geo_reference:
         If the points do not have a geo ref, assume 'absolute' values
         """
         import copy
-       
+
         # remember if we got a list
         is_list = isinstance(points, list)
 
         points = ensure_numeric(points, num.float)
 
-        # sanity checks	
+        # sanity checks
         if len(points.shape) == 1:
             #One point has been passed
             msg = 'Single point must have two elements'
@@ -250,33 +250,33 @@ class Geo_reference:
         assert len(points.shape) == 2, msg
 
         msg = 'Input must be an N x 2 array or list of (x,y) values. '
-        msg += 'I got an %d x %d array' %points.shape    
-        assert points.shape[1] == 2, msg                
+        msg += 'I got an %d x %d array' %points.shape
+        assert points.shape[1] == 2, msg
 
-        # FIXME (Ole): Could also check if zone, xllcorner, yllcorner 
-        # are identical in the two geo refs.    
+        # FIXME (Ole): Could also check if zone, xllcorner, yllcorner
+        # are identical in the two geo refs.
         if points_geo_ref is not self:
             # If georeferences are different
-            points = copy.copy(points) # Don't destroy input                    
+            points = copy.copy(points) # Don't destroy input
             if not points_geo_ref is None:
                 # Convert points to absolute coordinates
-                points[:,0] += points_geo_ref.xllcorner 
-                points[:,1] += points_geo_ref.yllcorner 
-        
+                points[:,0] += points_geo_ref.xllcorner
+                points[:,1] += points_geo_ref.yllcorner
+
             # Make points relative to primary geo reference
-            points[:,0] -= self.xllcorner 
+            points[:,0] -= self.xllcorner
             points[:,1] -= self.yllcorner
 
         if is_list:
             points = points.tolist()
-            
+
         return points
 
     def is_absolute(self):
         """Return True if xllcorner==yllcorner==0 indicating that points
         in question are absolute.
         """
-        
+
         # FIXME(Ole): It is unfortunate that decision about whether points
         # are absolute or not lies with the georeference object. Ross pointed this out.
         # Moreover, this little function is responsible for a large fraction of the time
@@ -284,12 +284,12 @@ class Geo_reference:
         # This was due to the repeated calls to allclose.
         # With the flag method fitting is much faster (18 Mar 2009).
 
-        # FIXME(Ole): HACK to be able to reuse data already cached (18 Mar 2009). 
+        # FIXME(Ole): HACK to be able to reuse data already cached (18 Mar 2009).
         # Remove at some point
         if not hasattr(self, 'absolute'):
             self.absolute = num.allclose([self.xllcorner, self.yllcorner], 0)
-            
-        # Return absolute flag    
+
+        # Return absolute flag
         return self.absolute
 
     def get_absolute(self, points):
@@ -305,25 +305,25 @@ class Geo_reference:
             # One point has been passed
             msg = 'Single point must have two elements'
             if not len(points) == 2:
-                raise ShapeError, msg    
+                raise ShapeError(msg)
 
 
         msg = 'Input must be an N x 2 array or list of (x,y) values. '
-        msg += 'I got an %d x %d array' %points.shape    
+        msg += 'I got an %d x %d array' %points.shape
         if not points.shape[1] == 2:
-            raise ShapeError, msg    
-            
-        
+            raise ShapeError(msg)
+
+
         # Add geo ref to points
         if not self.is_absolute():
-            points = copy.copy(points) # Don't destroy input                    
-            points[:,0] += self.xllcorner 
+            points = copy.copy(points) # Don't destroy input
+            points[:,0] += self.xllcorner
             points[:,1] += self.yllcorner
 
-        
+
         if is_list:
             points = points.tolist()
-             
+
         return points
 
     ##
@@ -346,22 +346,22 @@ class Geo_reference:
             #One point has been passed
             msg = 'Single point must have two elements'
             if not len(points) == 2:
-                raise ShapeError, msg    
+                raise ShapeError(msg)
 
         if not points.shape[1] == 2:
             msg = ('Input must be an N x 2 array or list of (x,y) values. '
                    'I got an %d x %d array' % points.shape)
-            raise ShapeError, msg    
+            raise ShapeError(msg)
 
         # Subtract geo ref from points
         if not self.is_absolute():
-            points = copy.copy(points) # Don't destroy input                            
-            points[:,0] -= self.xllcorner 
+            points = copy.copy(points) # Don't destroy input
+            points[:,0] -= self.xllcorner
             points[:,1] -= self.yllcorner
 
         if is_list:
             points = points.tolist()
-             
+
         return points
 
     ##
@@ -382,7 +382,7 @@ class Geo_reference:
             msg = ('Geospatial data must be in the same '
                    'ZONE to allow reconciliation. I got zone %d and %d'
                    % (self.zone, other.zone))
-            raise ANUGAError, msg
+            raise ANUGAError(msg)
 
     #def easting_northing2geo_reffed_point(self, x, y):
     #    return [x-self.xllcorner, y - self.xllcorner]

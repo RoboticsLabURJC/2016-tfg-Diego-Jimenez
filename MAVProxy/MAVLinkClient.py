@@ -292,13 +292,13 @@ def nextWaypointCMDVel(position, trajectory):
 
     waypoint = trajectory[0]
     vector = velVector(position, waypoint)
-    print "Waypoint: %s" %waypoint
+    print ("Waypoint: %s" %waypoint)
     dist = distance(waypoint, position)
-    print "distance: %f" %dist
+    print ("distance: %f" %dist)
 
     if (dist <= ReachedDist):
         trajectory = trajectory[1:len(trajectory)] #pop
-        print "Waypoint reached"
+        print ("Waypoint reached")
 
     return vector,trajectory
 
@@ -306,13 +306,13 @@ def nextWaypointPose3D(position, trajectory):
 
     waypoint = trajectory[0]
     #vector = velVector(position, waypoint)
-    print "Waypoint: %s" %waypoint
+    print ("Waypoint: %s" %waypoint)
     dist = distance(waypoint, position)
-    print "distance: %f" %dist
+    print ("distance: %f" %dist)
 
     if (dist <= ReachedDist):
         trajectory = trajectory[1:len(trajectory)] #pop
-        print "Waypoint reached"
+        print ("Waypoint reached")
 
     return trajectory
 
@@ -608,8 +608,8 @@ if __name__ == '__main__':
     StartWayPointXYZ = global2cartesian(StartWayPointLatLonHei)
     DefTrajectory = spiralTrajectory(StartWayPointXYZ, ScanDistance, SpinsNumber)
     trajectory = DefTrajectory
-    print 'Trajectory:'
-    print trajectory
+    print ('Trajectory:')
+    print (trajectory)
 
     targetBuffer = Buffer(10)
     targetFound = False
@@ -639,8 +639,8 @@ if __name__ == '__main__':
         # print OrangeCenter
         # print GreenArea
         # print OrangeArea
-        print GreenFound
-        print OrangeFound
+        print (GreenFound)
+        print (OrangeFound)
 
         twoAreas = GreenFound and OrangeFound
         nearAreas = distance(GreenCenter,OrangeCenter) <= math.sqrt(targetArea)
@@ -654,11 +654,11 @@ if __name__ == '__main__':
         targetBufferData = targetBuffer.get()
 
         targetFound = targetBuffer.decicion()
-        print targetBufferData
+        print (targetBufferData)
 
         if targetFound:
 
-            print 'Target Found'
+            print ('Target Found')
 
             CameraFOWrad = math.radians(CameraFOW)
             cameraCentrePixels = (ImageShape[1]/2, ImageShape[0]/2)
@@ -669,16 +669,16 @@ if __name__ == '__main__':
 
             # print cameraCentrePixels
             # print targetCentrePixels
-            print targetPose
+            print (targetPose)
 
 
 
             ### Landing decision make  ###
-            print 'Landing error: %f' %landingError
+            print ('Landing error: %f' %landingError)
 
             # Loiter if target is in the landing area #
             if (landingError < LandingPrecision) and (landingError != 0):
-                print 'Landing decision = TRUE'
+                print ('Landing decision = TRUE')
                 targetCentreMetres = (0,0)
                 landDecision = True
 
@@ -704,7 +704,7 @@ if __name__ == '__main__':
 
         else:
 
-            print 'Searching for target'
+            print ('Searching for target')
 
             # command, updatedTrajectory = nextWaypointCMDVel(xyz, trajectory)
             updatedTrajectory = nextWaypointPose3D(vehicleXYZ, trajectory)
@@ -713,8 +713,8 @@ if __name__ == '__main__':
             #restart trajectory when finish
             if (len(trajectory) == 0):
                 trajectory = DefTrajectory
-                print "Trajectory restarted:"
-                print trajectory
+                print ("Trajectory restarted:")
+                print (trajectory)
 
             #send waypoint to server
             wayPoint = jderobot.Pose3DData()

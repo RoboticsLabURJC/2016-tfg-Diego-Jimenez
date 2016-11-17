@@ -9,7 +9,7 @@ try:
     ic = Ice.initialize(sys.argv)
     base = ic.stringToProxy("CMDVel:default -p 9999")
     datos = jderobot.CMDVelPrx.checkedCast(base)
-    print datos
+    print (datos)
     if not datos:
         raise RuntimeError("Invalid proxy")
 

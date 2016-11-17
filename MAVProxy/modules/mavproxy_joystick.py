@@ -36,7 +36,7 @@ joymap = {
     # Same as above but is reporting a different name
     # http://www.hobbyking.com/hobbyking/store/__13597__USB_Simulator_Cable_XTR_AeroFly_FMS.html
     # has 4 usable axes. The last 4 are binary switches and not PWM outputs.
-    # Axis, Scaling Number, 
+    # Axis, Scaling Number,
     [(0, 500, 1500),
      (3, 500, 1500),
      (1, 500, 1500),
@@ -138,7 +138,7 @@ class JSModule(mp_module.MPModule):
                 for jtype in joymap:
                     if fnmatch.fnmatch(name, jtype):
                         print("Matched type '%s'" % jtype)
-                        print '%u axes available' % j.get_numaxes()
+                        print ('%u axes available' % j.get_numaxes())
                         self.js = j
                         self.num_axes = j.get_numaxes()
                         self.map = joymap[jtype]

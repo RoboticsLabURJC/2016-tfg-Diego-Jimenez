@@ -16,7 +16,7 @@ class DGPSModule(mp_module.MPModule):
         self.port.bind(("127.0.0.1", self.portnum))
         mavutil.set_close_on_exec(self.port.fileno())
         self.port.setblocking(0)
-        print "Listening for DGPS packets on UDP://%s:%s" % ("127.0.0.1", self.portnum)
+        print ("Listening for DGPS packets on UDP://%s:%s" % ("127.0.0.1", self.portnum))
 
     def idle_task(self):
         '''called in idle time'''
@@ -32,13 +32,13 @@ class DGPSModule(mp_module.MPModule):
         try:
 
             self.master.mav.gps_inject_data_send(
-                self.target_system,                                  
+                self.target_system,
                 self.target_component,
-                len(data), 
+                len(data),
                 bytearray(data.ljust(110, '\0')))
 
-        except Exception,e:
-            print "DGPS Failed:", e
+        except Exception(e):
+            print ("DGPS Failed:", e)
 
 def init(mpstate):
     '''initialise module'''

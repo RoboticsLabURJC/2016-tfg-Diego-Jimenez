@@ -76,7 +76,7 @@ class SRTMDownloader():
         self.server = server
         self.directory = directory
         self.cachedir = cachedir
-	'''print "SRTMDownloader - server= %s, directory=%s." % \
+        '''print "SRTMDownloader - server= %s, directory=%s." % \
               (self.server, self.directory)'''
         if not os.path.exists(cachedir):
             mp_util.mkdir_p(cachedir)
@@ -285,7 +285,7 @@ class SRTMTile:
         try:
             zipf = zipfile.ZipFile(f, 'r')
         except Exception:
-            raise InvalidTileError(lat, lon)            
+            raise InvalidTileError(lat, lon)
         names = zipf.namelist()
         if len(names) != 1:
             raise InvalidTileError(lat, lon)
@@ -443,7 +443,4 @@ if __name__ == '__main__':
     downloader = SRTMDownloader()
     downloader.loadFileList()
     tile = downloader.getTile(-36, 149)
-    print tile.getAltitudeFromLatLon(-35.282, 149.1287)
-
-
-
+    print (tile.getAltitudeFromLatLon(-35.282, 149.1287))

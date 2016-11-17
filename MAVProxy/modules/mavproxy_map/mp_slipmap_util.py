@@ -220,7 +220,7 @@ class SlipGrid(SlipObject):
         '''draw a polygon on the image'''
         if self.hidden:
             return
-	(x,y,w,h) = bounds
+        (x,y,w,h) = bounds
         spacing = 1000
         while True:
             start = mp_util.latlon_round((x,y), spacing)
@@ -232,7 +232,7 @@ class SlipGrid(SlipObject):
                 spacing *= 10
             else:
                 break
-        
+
         for i in range(count*2+2):
             pos1 = mp_util.gps_newpos(start[0], start[1], 90, i*spacing)
             pos3 = mp_util.gps_newpos(pos1[0], pos1[1], 0, 3*count*spacing)

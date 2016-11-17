@@ -158,7 +158,7 @@ Args the contain spaces must be entered like so: "arg with sapce"
                                message = 'Select directory for %s' % (option.dest),
                                defaultPath = path)
         else:
-            raise NotImplementedError(`option.type`)
+            raise NotImplementedError('option.type')
         dlg_result = dlg.ShowModal()
         if wx.ID_OK != dlg_result:
             return
@@ -316,8 +316,8 @@ def sample_parse_args_issue1():
 
 def main():
     options, args = sample_parse_args_issue1()
-    print 'args: %s' % repr( args )
-    print 'options: %s' % repr( options )
+    print ('args: %s' % repr( args ))
+    print ('options: %s' % repr( options ))
 
 if '__main__' == __name__:
     main()

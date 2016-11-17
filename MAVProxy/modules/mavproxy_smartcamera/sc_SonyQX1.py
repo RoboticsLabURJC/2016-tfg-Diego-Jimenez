@@ -53,7 +53,7 @@ import ssdp
 #                    __sSimpleCall
 #****************************************************************************
 class SmartCamera_SonyQX():
-    
+
 #****************************************************************************
 #   Method Name     : __init__ Class Initializer
 #
@@ -80,10 +80,10 @@ class SmartCamera_SonyQX():
 
         # latest image captured
         self.sLatestImageURL = None         # String with the URL to the latest image
-        
+
         # latest image downloaded
         self.sLatestImageFilename = None    #String with the file name for the last downloaded image
-    
+
         # Look Camera and Get URL
         self.sCameraURL = self.__sFindCameraURL(sNetInterface)
         if self.sCameraURL is None:
@@ -149,7 +149,7 @@ class SmartCamera_SonyQX():
                                   data=sData,
                                   headers=adictHeaders).json()
         return sResponse
-    
+
 #****************************************************************************
 #   Method Name     : __sSimpleCall
 #
@@ -199,10 +199,10 @@ class SmartCamera_SonyQX():
         if len(sRet) == 0:
             return None
         sDMS_URL = sRet[0].location
-        
+
         print("Fetching DMS from %s" % sDMS_URL)
         xmlReq = requests.request('GET', sDMS_URL)
-        
+
         xmlTree = ET.ElementTree(file=StringIO.StringIO(xmlReq.content))
         for xmlElem in xmlTree.iter():
             if xmlElem.tag == '{urn:schemas-sony-com:av}X_ScalarWebAPI_ActionList_URL':
@@ -273,7 +273,7 @@ class SmartCamera_SonyQX():
 
     def sGetLatestImageFilename(self):
         return self.sLatestImageFilename
-    
+
 #****************************************************************************
 #   Method Name     : u32GetImageCounter
 #
@@ -308,12 +308,12 @@ class SmartCamera_SonyQX():
 
         # Send command to set Exposure Mode
         sResponse = self.__sSimpleCall("actZoom", adictParams=["in","1shot"])
-        
+
         # Check response for a succesful result
         if 'result' in sResponse:
             print ("Zoomed in")
             return True
-        
+
         # In case of an error, return false
         print ("Failed to Zoom")
         return False
@@ -333,10 +333,10 @@ class SmartCamera_SonyQX():
 #****************************************************************************
 
     def boZoomOut(self):
-        
+
         # Send command to set Exposure Mode
         sResponse = self.__sSimpleCall("actZoom", adictParams=["out","1shot"])
-        
+
         # Check response for a succesful result
         if 'result' in sResponse:
             print ("Zoomed out")
@@ -364,19 +364,19 @@ class SmartCamera_SonyQX():
     def boSetExposureMode(self,sExposureMode):
         # Send command to set Exposure Mode
         sResponse = self.__sSimpleCall("setExposureMode", adictParams=[sExposureMode])
-        
+
         # Check response for a succesful result
         if 'result' in sResponse:
             time.sleep(0.25)
             sResponse = self.__sSimpleCall("getExposureMode")
-            
+
             if sExposureMode not in sResponse["result"]:
                 print ("Failed to set Exposure Mode, current value: %s" %sResponse["result"])
                 return False
-            
+
             print ("Exposure Mode set to %s" % sExposureMode)
             return True
-        
+
         # In case of an error, return false
         print ("Failed to set Exposure Mode")
         return False
@@ -403,19 +403,19 @@ class SmartCamera_SonyQX():
 
         # Send command to set Exposure Mode
         sResponse = self.__sSimpleCall("setShutterSpeed", adictParams=[sShutterSpeed])
-            
+
         # Check response for a succesful result
         if 'result' in sResponse:
             time.sleep(0.25)
             sResponse = self.__sSimpleCall("getShutterSpeed")
-            
+
             if sShutterSpeed not in sResponse["result"]:
                 print ("Failed to set Shutter Speed, current value: %s" %sResponse["result"])
                 return False
 
             print ("Shutter Speed set to %s" % sShutterSpeed)
             return True
-        
+
         # In case of an error, return false
         print ("Failed to set Shutter Speed")
         return False
@@ -442,19 +442,19 @@ class SmartCamera_SonyQX():
 
         # Send command to set Exposure Mode
         sResponse = self.__sSimpleCall("setFNumber", adictParams=[sFValue])
-        
+
         # Check response for a succesful result
         if 'result' in sResponse:
             time.sleep(0.25)
             sResponse = self.__sSimpleCall("getFNumber")
-            
+
             if sFValue not in sResponse["result"]:
                 print ("Failed to set aperture, current value: %s" %sResponse["result"])
                 return False
-            
+
             print ("Aperture set to %s" % sFValue)
             return True
-            
+
         # In case of an error, return false
         print ("Failed to set aperture")
         return False
@@ -477,10 +477,10 @@ class SmartCamera_SonyQX():
     def boSetISO(self,u16ISO):
         # Create ISO String
         sISO = str(u16ISO)
-        
+
         # Send command to set Exposure Mode
         sResponse = self.__sSimpleCall("setIsoSpeedRate", adictParams=[sISO])
-       
+
         # Check response for a succesful result
         if 'result' in sResponse:
             sResponse = self.__sSimpleCall("getIsoSpeedRate")
@@ -488,10 +488,10 @@ class SmartCamera_SonyQX():
             if sISO not in sResponse["result"]:
                 print ("Failed to Set ISO, current value: %s" %sResponse["result"])
                 return False
-            
+
             print ("ISO set to %s" % sISO)
             return True
-        
+
         # In case of an error, return false
         print ("Failed to Set ISO")
         return False
@@ -566,13 +566,13 @@ class SmartCamera_SonyQX():
                 # display image
                 cv2.imshow ('image_display', self.get_latest_image())
             else:
-                print "no image"
-    
+                print ("no image")
+
             # check for ESC key being pressed
             k = cv2.waitKey(5) & 0xFF
             if k == 27:
                 break
-    
+
             # take a rest for a bit
             time.sleep(0.01)
 
