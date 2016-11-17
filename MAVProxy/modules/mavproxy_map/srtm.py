@@ -135,7 +135,7 @@ class SRTMDownloader():
 
         data = r1.read()
         parser = parseHTMLDirectoryListing()
-        parser.feed(data)
+        parser.feed(str(data))
         continents = parser.getDirListing()
         '''print continents'''
         conn.close()
@@ -162,7 +162,7 @@ class SRTMDownloader():
             data = r1.read()
             conn.close()
             parser = parseHTMLDirectoryListing()
-            parser.feed(data)
+            parser.feed(str(data))
             files = parser.getDirListing()
 
             for filename in files:
