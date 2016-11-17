@@ -4,8 +4,9 @@
   MAVProxy message console, implemented in a child process
 """
 import multiprocessing, threading
-import textconsole, sys, time
-from wxconsole_util import Value, Text
+import sys, time
+from MAVProxy.modules.lib import textconsole
+from MAVProxy.modules.lib.wxconsole_util import Value, Text
 
 class MessageConsole(textconsole.SimpleConsole):
     '''
@@ -32,7 +33,7 @@ class MessageConsole(textconsole.SimpleConsole):
         '''child process - this holds all the GUI elements'''
         self.parent_pipe_send.close()
         self.parent_pipe_recv.close()
-        
+
         import wx_processguard
         from wx_loader import wx
         from wxconsole_ui import ConsoleFrame

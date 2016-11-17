@@ -9,7 +9,9 @@ Released under the GNU GPL version 3 or later
 
 import sys, os, time, socket, signal
 import fnmatch, errno, threading
-import serial, Queue, select
+import serial, select
+import queue as Queue
+import imp
 import traceback
 import select
 import shlex
@@ -277,7 +279,7 @@ def load_module(modname, quiet=False):
     for modpath in modpaths:
         try:
             m = import_package(modpath)
-            reload(m)
+            imp.reload(m)
             module = m.init(mpstate)
             if isinstance(module, mp_module.MPModule):
                 mpstate.modules.append((module, m))
@@ -853,7 +855,7 @@ def input_loop():
                     line = mpstate.tcp.readln()
                     mpstate.tcp.writeln(line)
                 else:
-                    line = raw_input(mpstate.rl.prompt)
+                    line = input(mpstate.rl.prompt)
         except EOFError:
             mpstate.status.exit = True
             sys.exit(1)

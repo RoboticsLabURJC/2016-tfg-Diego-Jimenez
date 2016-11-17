@@ -6,8 +6,8 @@
 """Load and process SRTM data. Originally written by OpenStreetMap
 Edited by CanberraUAV"""
 
-from HTMLParser import HTMLParser
-import httplib
+from html.parser import HTMLParser
+import http
 import re
 import pickle
 import os.path
@@ -124,7 +124,7 @@ class SRTMDownloader():
         mp_util.child_close_fds()
         if self.debug:
             print("Connecting to %s" % self.server)
-        conn = httplib.HTTPConnection(self.server)
+        conn = http.client.HTTPConnection(self.server)
         conn.request("GET",self.directory)
         r1 = conn.getresponse()
         '''if r1.status==200:
@@ -148,7 +148,7 @@ class SRTMDownloader():
             if self.debug:
                 print("fetching %s" % url)
             try:
-                conn = httplib.HTTPConnection(self.server)
+                conn = http.client.HTTPConnection(self.server)
                 conn.request("GET", url)
                 r1 = conn.getresponse()
             except Exception as ex:
@@ -249,7 +249,7 @@ class SRTMDownloader():
         mp_util.child_close_fds()
         if self.offline == 1:
             return
-        conn = httplib.HTTPConnection(self.server)
+        conn = http.client.HTTPConnection(self.server)
         conn.set_debuglevel(0)
         filepath = "%s%s%s" % \
                      (self.directory,continent,filename)
