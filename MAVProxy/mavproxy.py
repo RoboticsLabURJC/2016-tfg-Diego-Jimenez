@@ -431,7 +431,6 @@ def process_stdin(line):
     '''handle commands from user'''
     if line is None:
         sys.exit(0)
-
     # allow for modules to override input handling
     if mpstate.functions.input_handler is not None:
           mpstate.functions.input_handler(line)
@@ -465,7 +464,7 @@ def process_stdin(line):
 
     if cmd == 'help':
         k = command_map.keys()
-        k.sort()
+        #k.sort()
         for cmd in k:
             (fn, help) = command_map[cmd]
             print("%-15s : %s" % (cmd, help))
@@ -1509,19 +1508,19 @@ if __name__ == '__main__':
 
     PoseTheading = threading.Thread(target=openPose3DChannelWP, args=(WP_Pose3D,), name='WayPoint_Theading')
     PoseTheading.daemon = True
-    PoseTheading.start()
+    #PoseTheading.start()
 
     # Open an MAVLink TX communication and leave it open in a parallel threat
 
     PoseTheading = threading.Thread(target=sendWayPoint2Vehicle, args=(WP_Pose3D,), name='WayPoint2Vehicle_Theading')
     PoseTheading.daemon = True
-    PoseTheading.start()
+    #PoseTheading.start()
 
     # Open an MAVLink TX communication and leave it open in a parallel threat
 
     PoseTheading = threading.Thread(target=landDecision, args=(PH_CMDVel,), name='LandDecision2Vehicle_Theading')
     PoseTheading.daemon = True
-    PoseTheading.start()
+    #PoseTheading.start()
 
 
 
