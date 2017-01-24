@@ -16,7 +16,9 @@ import traceback
 import select
 import shlex
 import math
-import Ice, jderobot
+import Ice
+import jderobot
+import multiprocessing
 
 from MAVProxy.modules.lib import textconsole
 from MAVProxy.modules.lib import rline
@@ -31,6 +33,7 @@ from CMDVel import CMDVelI
 from Extra import ExtraI
 from pymavlink import quaternion
 
+lock = threading.Lock()
 # adding all this allows pyinstaller to build a working windows executable
 # note that using --hidden-import does not work for these modules
 try:
@@ -44,6 +47,7 @@ try:
 except Exception:
       pass
 
+#global lock
 if __name__ == '__main__':
       freeze_support()
 
@@ -472,7 +476,16 @@ def process_stdin(line):
     if cmd == 'exit' and mpstate.settings.requireexit:
         mpstate.status.exit = True
         return
+    ######################################################################################################
 
+    if cmd == 'velocity' and len(args) == 4:
+        #PH_Pose3D = Pose3DI(0,0,0,0,0,0,0,0) #1 to avoid indeterminations
+        PH_CMDVel = CMDVelI(args[1],args[2],args[3],0,0,0) #1 to avoid indeterminations
+        #print(PoseTheading.setArgs())
+        #PH_CMDVel = (args[1],args[2],args[3],0,0,0)
+    if cmd == 's':
+        PH_CMDVel = CMDVelI(0,0,0,0,0,0) #1 to avoid indeterminations
+    ######################################################################################################
     if not cmd in command_map:
         for (m,pm) in mpstate.modules:
             if hasattr(m, 'unknown_command'):
@@ -483,6 +496,7 @@ def process_stdin(line):
                     print("ERROR in command: %s" % str(e))
         print("Unknown command '%s'" % line)
         return
+
     (fn, help) = command_map[cmd]
     try:
         fn(args[1:])
@@ -741,6 +755,7 @@ def main_loop():
             if len(cmds) == 1 and cmds[0] == "":
                   mpstate.empty_input_count += 1
             for c in cmds:
+                print(c)
                 process_stdin(c)
 
         for master in mpstate.mav_master:
@@ -842,6 +857,13 @@ def main_loop():
 
         #####################################################################
 
+        ######################### Diego Jimenez CODE ############################################
+
+
+
+
+
+
 def input_loop():
     '''wait for user input'''
     while mpstate.status.exit != True:
@@ -882,7 +904,6 @@ def run_script(scriptfile):
 ########################## Jorge Cano CODE ##########################
 
 def openPose3DChannel(Pose3D):
-
     status = 0
     ic = None
     Pose2Tx = Pose3D #Pose3D.getPose3DData()
@@ -943,7 +964,7 @@ def openCMDVelChannel(CMDVel):
         ic = Ice.initialize(sys.argv)
         adapter = ic.createObjectAdapterWithEndpoints("CMDVelAdapter", "default -p 9997")
         object = CMDVel2Rx
-        #print CMDVel2Rx
+        print (CMDVel2Rx)
         adapter.add(object, ic.stringToIdentity("CMDVel"))
         adapter.activate()
         ic.waitForShutdown()
@@ -1023,22 +1044,18 @@ def openNavdataChannel():
     sys.exit(status)
 
 def sendCMDVel2Vehicle(CMDVel,Pose3D):
-
     while True:
-
         CMDVel2send = CMDVel.getCMDVelData()
+
         Pose3D2send = Pose3D.getPose3DData()
         NEDvel = body2NED(CMDVel2send, Pose3D2send) # [x,y,z]
-
         linearXstring = str(NEDvel[0])
         linearYstring = str(NEDvel[1])
         linearZstring = str(NEDvel[2])
 
-        velocitystring = 'velocity '+ linearXstring + ' ' + linearYstring + ' ' + linearZstring
-
-        # print velocitystring
-
-        print ('CMDVel :')
+        #velocitystring = 'velocity '+ linearXstring + ' ' + linearYstring + ' ' + linearZstring
+        velocitystring = 'velocity 0.01 0 0'
+        #print ('CMDVel :')
         process_stdin(velocitystring)  # SET_POSITION_TARGET_LOCAL_NED
 
 def sendWayPoint2Vehicle(Pose3D):
@@ -1114,46 +1131,50 @@ def cartesian2global(poseXYZ):
 def body2NED(CMDVel, Pose3D):
 
 
-    q1 = [0, CMDVel.linearX, CMDVel.linearY, CMDVel.linearZ]
-    q2 = [Pose3D.q0, Pose3D.q1, Pose3D.q2, Pose3D.q3]
+    #q1 = [0, CMDVel.linearX, CMDVel.linearY, CMDVel.linearZ]
+    #q2 = [Pose3D.q0, Pose3D.q1, Pose3D.q2, Pose3D.q3]
 
-    q1 = qNormal(q1)
-    q2 = qNormal(q2)
+    #q1 = qNormal(q1)
+    #q2 = qNormal(q2)
 
-    #rotation = q2*q1*q2'
+    ##rotation = q2*q1*q2'
 
-    q2inverse = qInverse(q2)
-    qtempotal = qMultiply(q1,q2inverse)
-    q = qMultiply(q2,qtempotal)
+    #q2inverse = qInverse(q2)
+    #qtempotal = qMultiply(q1,q2inverse)
+    #q = qMultiply(q2,qtempotal)
 
-    rotatedVector = q[1:len(q)] #obtain [q1,q2,q3]
+    #rotatedVector = q[1:len(q)] #obtain [q1,q2,q3]
 
-    return rotatedVector
+    #return rotatedVector
 
-    # q0 = Pose3D.q0
-    # q1 = Pose3D.q1
-    # q2 = Pose3D.q2
-    # q3 = Pose3D.q3
-    #
-    # # obtain eulers from quaternion TO BE IMPROVED!!!!!!!!!!!
-    #
-    # roll = 1/ math.tan((2*(q1*q2+q0*q3))/(q3*q3+q2*q2-q1*q1-q0*q0))
-    # pitch = 1/math.sin(-2*(q0*q2-q1*q3))
-    # yaw = 1/ math.tan((2*(q0*q1+q3*q2))/(q3*q3-q2*q2-q1*q1+q0*q0))
-    #
-    # # Body velocity (x,y,z)
-    #
-    # bvx = CMDVel.linearX
-    # bvy = CMDVel.linearY
-    # bvz = CMDVel.linearZ
-    #
-    # NEDvel = [0,0,0] #[x,y,z]
-    #
-    # NEDvel[0] = bvx * math.cos(pitch)*math.cos(yaw)   + bvy * (math.sin(roll)*math.sin(pitch)*math.cos(yaw) - math.cos(roll)*math.sin(yaw))   + bvz * (math.cos(roll)*math.sin(pitch)*math.cos(yaw) + math.sin(roll)*math.sin(yaw))
-    # NEDvel[1] = bvx * math.cos(pitch)*math.sin(yaw)   + bvy * (math.sin(roll)*math.sin(pitch)*math.sin(yaw) + math.cos(roll)*math.cos(yaw))   + bvz * (math.cos(roll)*math.sin(pitch)*math.sin(yaw) - math.sin(roll)*math.cos(yaw))
-    # NEDvel[2] = -bvx * math.sin(pitch)                + bvy * (math.sin(roll)*math.cos(pitch))                                                + bvz * (math.cos(roll)*math.cos(pitch))
-    #
-    # return NEDvel
+     q0 = Pose3D.q0
+     q1 = Pose3D.q1
+     q2 = Pose3D.q2
+     q3 = Pose3D.q3
+
+     # obtain eulers from quaternion TO BE IMPROVED!!!!!!!!!!!
+
+     #roll = 1/ math.tan((2*(q1*q2+q0*q3))/(q3*q3+q2*q2-q1*q1-q0*q0))
+     #pitch = 1/math.sin(-2*(q0*q2-q1*q3))
+     #yaw = 1/ math.tan((2*(q0*q1+q3*q2))/(q3*q3-q2*q2-q1*q1+q0*q0))
+
+     # Body velocity (x,y,z)
+
+     bvx = CMDVel.linearX
+     bvy = CMDVel.linearY
+     bvz = CMDVel.linearZ
+
+     NEDvel = [0,0,0] #[x,y,z]
+
+     #NEDvel[0] = bvx * math.cos(pitch)*math.cos(yaw)   + bvy * (math.sin(roll)*math.sin(pitch)*math.cos(yaw) - math.cos(roll)*math.sin(yaw))   + bvz * (math.cos(roll)*math.sin(pitch)*math.cos(yaw) + math.sin(roll)*math.sin(yaw))
+     #NEDvel[1] = bvx * math.cos(pitch)*math.sin(yaw)   + bvy * (math.sin(roll)*math.sin(pitch)*math.sin(yaw) + math.cos(roll)*math.cos(yaw))   + bvz * (math.cos(roll)*math.sin(pitch)*math.sin(yaw) - math.sin(roll)*math.cos(yaw))
+     #NEDvel[2] = -bvx * math.sin(pitch)                + bvy * (math.sin(roll)*math.cos(pitch))                                                + bvz * (math.cos(roll)*math.cos(pitch))
+
+     NEDvel[0]=bvx
+     NEDvel[1]=bvy
+     NEDvel[2]=bvz
+
+     return NEDvel
 
 def qMultiply (q1,q2):
 
@@ -1475,60 +1496,59 @@ if __name__ == '__main__':
 
     #Open an ICE TX communication and leave it open in a parallel threat
 
-    PoseTheading = threading.Thread(target=openPose3DChannel, args=(PH_Pose3D,), name='Pose_Theading')
-    PoseTheading.daemon = True
-    PoseTheading.start()
+    #PoseTheading = threading.Thread(target=openPose3DChannel, args=(PH_Pose3D,), name='Pose_Theading')
+    #PoseTheading.daemon = True
+    #PoseTheading.start()
 
     # Open an ICE RX communication and leave it open in a parallel threat
 
-    CMDVelTheading = threading.Thread(target=openCMDVelChannel, args=(PH_CMDVel,), name='CMDVel_Theading')
-    CMDVelTheading.daemon = True
-    CMDVelTheading.start()
+    #CMDVelTheading = threading.Thread(target=openCMDVelChannel, args=(PH_CMDVel,), name='CMDVel_Theading')
+    #CMDVelTheading.daemon = True
+    #CMDVelTheading.start()
 
     # Open an ICE TX communication and leave it open in a parallel threat
 
-    CMDVelTheading = threading.Thread(target=openExtraChannel, args=(PH_Extra,), name='Extra_Theading')
-    CMDVelTheading.daemon = True
-    CMDVelTheading.start()
+    #CMDVelTheading = threading.Thread(target=openExtraChannel, args=(PH_Extra,), name='Extra_Theading')
+    #CMDVelTheading.daemon = True
+    #CMDVelTheading.start()
 
     # Open an ICE channel empty
 
-    CMDVelTheading = threading.Thread(target=openNavdataChannel, args=(), name='Navdata_Theading')
-    CMDVelTheading.daemon = True
-    CMDVelTheading.start()
+    #CMDVelTheading = threading.Thread(target=openNavdataChannel, args=(), name='Navdata_Theading')
+    #CMDVelTheading.daemon = True
+    #CMDVelTheading.start()
 
     # # Open an MAVLink TX communication and leave it open in a parallel threat
     #
-    # PoseTheading = threading.Thread(target=sendCMDVel2Vehicle, args=(PH_CMDVel,PH_Pose3D,), name='TxCMDVel_Theading')
-    # PoseTheading.daemon = True
-    # PoseTheading.start()
+    #PoseTheading = threading.Thread(target=sendCMDVel2Vehicle, args=(PH_CMDVel,PH_Pose3D,), name='TxCMDVel_Theading')
+    #PoseTheading.daemon = True
+    #PoseTheading.start()
 
 
     # Open an ICE TX communication and leave it open in a parallel threat
 
-    PoseTheading = threading.Thread(target=openPose3DChannelWP, args=(WP_Pose3D,), name='WayPoint_Theading')
-    PoseTheading.daemon = True
+    #PoseTheading = threading.Thread(target=openPose3DChannelWP, args=(WP_Pose3D,), name='WayPoint_Theading')
+    #PoseTheading.daemon = True
     #PoseTheading.start()
 
     # Open an MAVLink TX communication and leave it open in a parallel threat
 
-    PoseTheading = threading.Thread(target=sendWayPoint2Vehicle, args=(WP_Pose3D,), name='WayPoint2Vehicle_Theading')
-    PoseTheading.daemon = True
+    #PoseTheading = threading.Thread(target=sendWayPoint2Vehicle, args=(WP_Pose3D,), name='WayPoint2Vehicle_Theading')
+    #PoseTheading.daemon = True
     #PoseTheading.start()
 
     # Open an MAVLink TX communication and leave it open in a parallel threat
 
-    PoseTheading = threading.Thread(target=landDecision, args=(PH_CMDVel,), name='LandDecision2Vehicle_Theading')
-    PoseTheading.daemon = True
+    #PoseTheading = threading.Thread(target=landDecision, args=(PH_CMDVel,), name='LandDecision2Vehicle_Theading')
+    #PoseTheading.daemon = True
     #PoseTheading.start()
 
 
 
-    # while True:
-    #     time.sleep(1)
-    #     Posejarl = PH_Pose3D.getPose3DData()
-    #     print Posejarl
-
+    #while True:
+    #    time.sleep(1)
+    #    Posejarl = PH_Pose3D.getPose3DData()
+    #    print (Posejarl)
 
     #####################################################################
 

@@ -158,16 +158,26 @@ class CmdlongModule(mp_module.MPModule):
             y_mps = float(args[1])
             z_mps = float(args[2])
             print("x:%f, y:%f, z:%f" % (x_mps, y_mps, z_mps))
+#            self.master.mav.set_position_target_local_ned_send(
+#                                      0,  # system time in milliseconds
+#                                      1,  # target system
+#                                      0,  # target component
+#                                      8,  # coordinate frame MAV_FRAME_BODY_NED
+#                                      455,      # type mask (vel only)
+#                                      0, 0, 0,  # position x,y,z
+#                                      x_mps, y_mps, z_mps,  # velocity x,y,z
+#                                      0, 0, 0,  # accel x,y,z
+#                                      0, 0)     # yaw, yaw rate
             self.master.mav.set_position_target_local_ned_send(
-                                      0,  # system time in milliseconds
-                                      1,  # target system
-                                      0,  # target component
-                                      8,  # coordinate frame MAV_FRAME_BODY_NED
-                                      455,      # type mask (vel only)
-                                      0, 0, 0,  # position x,y,z
-                                      x_mps, y_mps, z_mps,  # velocity x,y,z
-                                      0, 0, 0,  # accel x,y,z
-                                      0, 0)     # yaw, yaw rate
+                0,       # time_boot_ms (not used)
+                0, 0,    # target system, target component
+                mavutil.mavlink.MAV_FRAME_LOCAL_NED, # frame
+                0b0000111111000111, # type_mask (only speeds enabled)
+                0, 0, 0, # x, y, z positions (not used)
+                x_mps, y_mps, -z_mps, # x, y, z velocity in m/s
+                0, 0, 0, # x, y, z acceleration (not supported yet, ignored in GCS_Mavlink)
+                0, 0)    # yaw, yaw_rate (not supported yet, ignored in GCS_Mavlink)
+
 
     def cmd_position(self, args):
         '''position x-m y-m z-m'''

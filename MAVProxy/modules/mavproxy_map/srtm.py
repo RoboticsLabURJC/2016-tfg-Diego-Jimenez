@@ -124,66 +124,66 @@ class SRTMDownloader():
         mp_util.child_close_fds()
         if self.debug:
             print("Connecting to %s" % self.server)
-        conn = http.client.HTTPConnection(self.server)
-        conn.request("GET",self.directory)
-        r1 = conn.getresponse()
+        #conn = http.client.HTTPConnection(self.server)
+        #conn.request("GET",self.directory)
+        #r1 = conn.getresponse()
         '''if r1.status==200:
             print "status200 received ok"
         else:
             print "oh no = status=%d %s" \
                   % (r1.status,r1.reason)'''
 
-        data = r1.read()
-        parser = parseHTMLDirectoryListing()
-        parser.feed(str(data))
-        continents = parser.getDirListing()
+        #data = r1.read()
+        #parser = parseHTMLDirectoryListing()
+        #parser.feed(str(data))
+        #continents = parser.getDirListing()
         '''print continents'''
-        conn.close()
+        #conn.close()
 
-        for continent in continents:
-            if not continent[0].isalpha() or continent.startswith('README'):
-                continue
-            '''print "Downloading file list for", continent'''
-            url = "%s%s" % (self.directory,continent)
-            if self.debug:
-                print("fetching %s" % url)
-            try:
-                conn = http.client.HTTPConnection(self.server)
-                conn.request("GET", url)
-                r1 = conn.getresponse()
-            except Exception as ex:
-                print("Failed to download %s : %s" % (url, ex))
-                continue
-            '''if r1.status==200:
-                print "status200 received ok"
-            else:
-                print "oh no = status=%d %s" \
-                      % (r1.status,r1.reason)'''
-            data = r1.read()
-            conn.close()
-            parser = parseHTMLDirectoryListing()
-            parser.feed(str(data))
-            files = parser.getDirListing()
+        #for continent in continents:
+        #    if not continent[0].isalpha() or continent.startswith('README'):
+        #        continue
+        #    '''print "Downloading file list for", continent'''
+        #    url = "%s%s" % (self.directory,continent)
+        #    if self.debug:
+        #        print("fetching %s" % url)
+        #    try:
+        #        conn = http.client.HTTPConnection(self.server)
+        #        conn.request("GET", url)
+        #        r1 = conn.getresponse()
+        #    except Exception as ex:
+        #        print("Failed to download %s : %s" % (url, ex))
+        #        continue
+        #    '''if r1.status==200:
+        #        print "status200 received ok"
+        #    else:
+        #        print "oh no = status=%d %s" \
+        #              % (r1.status,r1.reason)'''
+        #    data = r1.read()
+        #    conn.close()
+        #    parser = parseHTMLDirectoryListing()
+        #    parser.feed(str(data))
+        #    files = parser.getDirListing()
 
-            for filename in files:
-                self.filelist[self.parseFilename(filename)] = (
-                            continent, filename)
+        #    for filename in files:
+        #        self.filelist[self.parseFilename(filename)] = (
+        #                    continent, filename)
 
-            '''print self.filelist'''
-        # Add meta info
-        self.filelist["server"] = self.server
-        self.filelist["directory"] = self.directory
-        tmpname = self.filelist_file + ".tmp"
-        with open(tmpname , 'wb') as output:
-            pickle.dump(self.filelist, output)
-            output.close()
-            try:
-                os.unlink(self.filelist_file)
-            except Exception:
-                pass
-            os.rename(tmpname, self.filelist_file)
-        if self.debug:
-            print("created file list with %u entries" % len(self.filelist))
+        #    '''print self.filelist'''
+        ## Add meta info
+        #self.filelist["server"] = self.server
+        #self.filelist["directory"] = self.directory
+        #tmpname = self.filelist_file + ".tmp"
+        #with open(tmpname , 'wb') as output:
+        #    pickle.dump(self.filelist, output)
+        #    output.close()
+        #    try:
+        #        os.unlink(self.filelist_file)
+        #    except Exception:
+        #        pass
+        #    os.rename(tmpname, self.filelist_file)
+        #if self.debug:
+        #    print("created file list with %u entries" % len(self.filelist))
 
     def parseFilename(self, filename):
         """Get lat/lon values from filename."""
