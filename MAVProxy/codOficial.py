@@ -35,7 +35,7 @@ if not connection_string:
 
 
 # Connect to the Vehicle
-print 'Connecting to vehicle on: %s' % connection_string
+print ('Connecting to vehicle on: %s' % connection_string)
 vehicle = connect(connection_string, wait_ready=True)
 
 
@@ -44,37 +44,37 @@ def arm_and_takeoff(aTargetAltitude):
     Arms vehicle and fly to aTargetAltitude.
     """
 
-    print "Basic pre-arm checks"
+    print ("Basic pre-arm checks")
     # Don't let the user try to arm until autopilot is ready
     while not vehicle.is_armable:
-        print " Waiting for vehicle to initialise..."
+        print (" Waiting for vehicle to initialise...")
         time.sleep(1)
 
 
-    print "Arming motors"
+    print ("Arming motors")
     # Copter should arm in GUIDED mode
     vehicle.mode = VehicleMode("GUIDED")
     vehicle.armed = True
 
     while not vehicle.armed:
-        print " Waiting for arming..."
+        print (" Waiting for arming...")
         time.sleep(1)
 
-    print "Taking off!"
+    print ("Taking off!")
     vehicle.simple_takeoff(aTargetAltitude) # Take off to target altitude
 
     # Wait until the vehicle reaches a safe height before processing the goto (otherwise the command
     #  after Vehicle.simple_takeoff will execute immediately).
     while True:
-        print " Altitude: ", vehicle.location.global_relative_frame.alt
+        print (" Altitude: ", vehicle.location.global_relative_frame.alt)
         if vehicle.location.global_relative_frame.alt>=aTargetAltitude*0.95: #Trigger just below target alt.
-            print "Reached target altitude"
+            print ("Reached target altitude")
             break
         time.sleep(1)
 
 
 #Arm and take of to altitude of 5 meters
-arm_and_takeoff(5)
+arm_and_takeoff(2)
 
 
 
@@ -316,9 +316,9 @@ def goto(dNorth, dEast, gotoFunction=vehicle.simple_goto):
     while vehicle.mode.name=="GUIDED": #Stop action if we are no longer in guided mode.
         #print "DEBUG: mode: %s" % vehicle.mode.name
         remainingDistance=get_distance_metres(vehicle.location.global_relative_frame, targetLocation)
-        print "Distance to target: ", remainingDistance
+        print ("Distance to target: ", remainingDistance)
         if remainingDistance<=targetDistance*0.01: #Just below target, in case of undershoot.
-            print "Reached target"
+            print ("Reached target")
             break;
         time.sleep(2)
 
@@ -408,107 +408,6 @@ def send_global_velocity(velocity_x, velocity_y, velocity_z, duration):
 
 
 """
-Fly a triangular path using the standard Vehicle.simple_goto() method.
-
-The method is called indirectly via a custom "goto" that allows the target position to be
-specified as a distance in metres (North/East) from the current position, and which reports
-the distance-to-target.
-"""
-print("TRIANGLE path using standard Vehicle.simple_goto()")
-
-print("Set groundspeed to 5m/s.")
-vehicle.groundspeed=5
-
-print("Position North 80 West 50")
-goto(80, -50)
-
-print("Position North 0 East 100")
-goto(0, 100)
-
-print("Position North -80 West 50")
-goto(-80, -50)
-
-
-
-
-"""
-Fly a triangular path using the SET_POSITION_TARGET_GLOBAL_INT command and specifying
-a target position (rather than controlling movement using velocity vectors). The command is
-called from goto_position_target_global_int() (via `goto`).
-
-The goto_position_target_global_int method is called indirectly from a custom "goto" that allows
-the target position to be specified as a distance in metres (North/East) from the current position,
-and which reports the distance-to-target.
-
-The code also sets the speed (MAV_CMD_DO_CHANGE_SPEED). In AC3.2.1 Copter will accelerate to this speed
-near the centre of its journey and then decelerate as it reaches the target.
-In AC3.3 the speed changes immediately.
-"""
-print("TRIANGLE path using standard SET_POSITION_TARGET_GLOBAL_INT message and with varying speed.")
-print("Position South 100 West 130")
-
-print("Set groundspeed to 5m/s.")
-vehicle.groundspeed = 5
-goto(-100, -130, goto_position_target_global_int)
-
-print("Set groundspeed to 15m/s (max).")
-vehicle.groundspeed = 15
-print("Position South 0 East 200")
-goto(0, 260, goto_position_target_global_int)
-
-print("Set airspeed to 10m/s (max).")
-vehicle.airspeed = 10
-
-print("Position North 100 West 130")
-goto(100, -130, goto_position_target_global_int)
-
-
-
-"""
-Fly the vehicle in a 50m square path, using the SET_POSITION_TARGET_LOCAL_NED command
-and specifying a target position (rather than controlling movement using velocity vectors).
-The command is called from goto_position_target_local_ned() (via `goto`).
-
-The position is specified in terms of the NED (North East Down) relative to the Home location.
-
-WARNING: The "D" in NED means "Down". Using a positive D value will drive the vehicle into the ground!
-
-The code sleeps for a time (DURATION) to give the vehicle time to reach each position (rather than
-sending commands based on proximity).
-
-The code also sets the region of interest (MAV_CMD_DO_SET_ROI) via the `set_roi()` method. This points the
-camera gimbal at the the selected location (in this case it aligns the whole vehicle to point at the ROI).
-"""
-
-print("SQUARE path using SET_POSITION_TARGET_LOCAL_NED and position parameters")
-DURATION = 20 #Set duration for each segment.
-
-print("North 50m, East 0m, 10m altitude for %s seconds" % DURATION)
-goto_position_target_local_ned(50,0,-10)
-print("Point ROI at current location (home position)")
-# NOTE that this has to be called after the goto command as first "move" command of a particular type
-# "resets" ROI/YAW commands
-set_roi(vehicle.location.global_relative_frame)
-time.sleep(DURATION)
-
-print("North 50m, East 50m, 10m altitude")
-goto_position_target_local_ned(50,50,-10)
-time.sleep(DURATION)
-
-print("Point ROI at current location")
-set_roi(vehicle.location.global_relative_frame)
-
-print("North 0m, East 50m, 10m altitude")
-goto_position_target_local_ned(0,50,-10)
-time.sleep(DURATION)
-
-print("North 0m, East 0m, 10m altitude")
-goto_position_target_local_ned(0,0,-10)
-time.sleep(DURATION)
-
-
-
-"""
 Fly the vehicle in a SQUARE path using velocity vectors (the underlying code calls the
 SET_POSITION_TARGET_LOCAL_NED command with the velocity parameters enabled).
 
@@ -518,18 +417,18 @@ The code also sets the yaw (MAV_CMD_CONDITION_YAW) using the `set_yaw()` method 
 so that the front of the vehicle points in the direction of travel
 """
 
-
+DURATION = 2
 #Set up velocity vector to map to each direction.
 # vx > 0 => fly North
 # vx < 0 => fly South
-NORTH = 2
-SOUTH = -2
+NORTH = 1
+SOUTH = -1
 
 # Note for vy:
 # vy > 0 => fly East
 # vy < 0 => fly West
-EAST = 2
-WEST = -2
+EAST = 1
+WEST = -1
 
 # Note for vz:
 # vz < 0 => ascend
@@ -553,7 +452,7 @@ print("Yaw 270 absolute (West)")
 condition_yaw(270)
 
 print("Velocity West & down")
-send_ned_velocity(0,WEST,DOWN,DURATION)
+send_ned_velocity(0,WEST,0,DURATION)
 send_ned_velocity(0,0,0,1)
 
 
@@ -574,62 +473,6 @@ send_ned_velocity(0,0,0,1)
 
 
 """
-Fly the vehicle in a DIAMOND path using velocity vectors (the underlying code calls the
-SET_POSITION_TARGET_GLOBAL_INT command with the velocity parameters enabled).
-
-The thread sleeps for a time (DURATION) which defines the distance that will be travelled.
-
-The code sets the yaw (MAV_CMD_CONDITION_YAW) using the `set_yaw()` method using relative headings
-so that the front of the vehicle points in the direction of travel.
-
-At the end of the second segment the code sets a new home location to the current point.
-"""
-
-print("DIAMOND path using SET_POSITION_TARGET_GLOBAL_INT and velocity parameters")
-# vx, vy are parallel to North and East (independent of the vehicle orientation)
-
-print("Yaw 225 absolute")
-condition_yaw(225)
-
-print("Velocity South, West and Up")
-send_global_velocity(SOUTH,WEST,UP,DURATION)
-send_global_velocity(0,0,0,1)
-
-
-print("Yaw 90 relative (to previous yaw heading)")
-condition_yaw(90,relative=True)
-
-print("Velocity North, West and Down")
-send_global_velocity(NORTH,WEST,DOWN,DURATION)
-send_global_velocity(0,0,0,1)
-
-print("Set new home location to current location")
-vehicle.home_location=vehicle.location.global_frame
-print "Get new home location"
-#This reloads the home location in DroneKit and GCSs
-cmds = vehicle.commands
-cmds.download()
-cmds.wait_ready()
-print " Home Location: %s" % vehicle.home_location
-
-
-print("Yaw 90 relative (to previous yaw heading)")
-condition_yaw(90,relative=True)
-
-print("Velocity North and East")
-send_global_velocity(NORTH,EAST,0,DURATION)
-send_global_velocity(0,0,0,1)
-
-
-print("Yaw 90 relative (to previous yaw heading)")
-condition_yaw(90,relative=True)
-
-print("Velocity South and East")
-send_global_velocity(SOUTH,EAST,0,DURATION)
-send_global_velocity(0,0,0,1)
-
-
-"""
 The example is completing. LAND at current location.
 """
 
@@ -638,7 +481,7 @@ vehicle.mode = VehicleMode("LAND")
 
 
 #Close vehicle object before exiting script
-print "Close vehicle object"
+print ("Close vehicle object")
 vehicle.close()
 
 # Shut down simulator if it was started.

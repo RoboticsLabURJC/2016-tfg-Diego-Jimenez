@@ -157,17 +157,8 @@ class CmdlongModule(mp_module.MPModule):
             x_mps = float(args[0])
             y_mps = float(args[1])
             z_mps = float(args[2])
-            print("x:%f, y:%f, z:%f" % (x_mps, y_mps, z_mps))
-#            self.master.mav.set_position_target_local_ned_send(
-#                                      0,  # system time in milliseconds
-#                                      1,  # target system
-#                                      0,  # target component
-#                                      8,  # coordinate frame MAV_FRAME_BODY_NED
-#                                      455,      # type mask (vel only)
-#                                      0, 0, 0,  # position x,y,z
-#                                      x_mps, y_mps, z_mps,  # velocity x,y,z
-#                                      0, 0, 0,  # accel x,y,z
-#                                      0, 0)     # yaw, yaw rate
+            #print("x:%f, y:%f, z:%f" % (x_mps, y_mps, z_mps))
+
             self.master.mav.set_position_target_local_ned_send(
                 0,       # time_boot_ms (not used)
                 0, 0,    # target system, target component

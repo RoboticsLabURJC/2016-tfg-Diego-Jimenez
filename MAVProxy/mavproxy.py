@@ -19,6 +19,7 @@ import math
 import Ice
 import jderobot
 import multiprocessing
+import time
 
 from MAVProxy.modules.lib import textconsole
 from MAVProxy.modules.lib import rline
@@ -33,7 +34,12 @@ from CMDVel import CMDVelI
 from Extra import ExtraI
 from pymavlink import quaternion
 
-lock = threading.Lock()
+global operation_takeoff
+global time_init_operation_takeoff
+global time_end_operation_takeoff
+global on_air
+
+
 # adding all this allows pyinstaller to build a working windows executable
 # note that using --hidden-import does not work for these modules
 try:
@@ -47,7 +53,6 @@ try:
 except Exception:
       pass
 
-#global lock
 if __name__ == '__main__':
       freeze_support()
 
@@ -477,14 +482,8 @@ def process_stdin(line):
         mpstate.status.exit = True
         return
     ######################################################################################################
-
     if cmd == 'velocity' and len(args) == 4:
-        #PH_Pose3D = Pose3DI(0,0,0,0,0,0,0,0) #1 to avoid indeterminations
         PH_CMDVel = CMDVelI(args[1],args[2],args[3],0,0,0) #1 to avoid indeterminations
-        #print(PoseTheading.setArgs())
-        #PH_CMDVel = (args[1],args[2],args[3],0,0,0)
-    if cmd == 's':
-        PH_CMDVel = CMDVelI(0,0,0,0,0,0) #1 to avoid indeterminations
     ######################################################################################################
     if not cmd in command_map:
         for (m,pm) in mpstate.modules:
@@ -733,98 +732,104 @@ def periodic_tasks():
         if m.needs_unloading:
             unload_module(m.name)
 
+def listener_loop():
+    while True:
+        global on_air
+        global operation_takeoff
+        global time_init_operation_takeoff
+        global time_end_operation_takeoff
+        time_now = int(round(time.time() * 1000))
+        if operation_takeoff  and time_now > time_end_operation_takeoff:
+            time_init_operation_takeoff = int(round(time.time() * 1000))
+            time_end_operation_takeoff = time_init_operation_takeoff + 5000
+            operation_takeoff = False
+            on_air = True
+            print("Despegando")
+            mpstate.input_queue.put("takeoff 1")
+        if on_air and time_now > time_end_operation_takeoff:
+            mpstate.input_queue.put("mode guided")
+            on_air = False
+        main_loop()
+
 def main_loop():
     '''main processing loop'''
     if not mpstate.status.setup_mode and not opts.nowait:
         for master in mpstate.mav_master:
             send_heartbeat(master)
-            if master.linknum == 0:
-                print("Waiting for heartbeat from %s" % master.address)
-                master.wait_heartbeat()
+            #if master.linknum == 0:
+                #print("Waiting for heartbeat from %s" % master.address)
+                #master.wait_heartbeat()
         set_stream_rates()
-
-    while True:
-
-        if mpstate is None or mpstate.status.exit:
-            return
+    if mpstate is None or mpstate.status.exit:
+        return
         #cmd
-        while not mpstate.input_queue.empty():
-            line = mpstate.input_queue.get()
-            mpstate.input_count += 1
-            cmds = line.split(';')
-            if len(cmds) == 1 and cmds[0] == "":
-                  mpstate.empty_input_count += 1
-            for c in cmds:
-                print(c)
-                process_stdin(c)
-
+    while not mpstate.input_queue.empty():
+        line = mpstate.input_queue.get()
+        mpstate.input_count += 1
+        cmds = line.split(';')
+        if len(cmds) == 1 and cmds[0] == "":
+              mpstate.empty_input_count += 1
+        for c in cmds:
+            process_stdin(c)
+    for master in mpstate.mav_master:
+        if master.fd is None:
+            if master.port.inWaiting() > 0:
+                process_master(master)
+    periodic_tasks()
+    rin = []
+    for master in mpstate.mav_master:
+        if master.fd is not None and not master.portdead:
+            rin.append(master.fd)
+    for m in mpstate.mav_outputs:
+        rin.append(m.fd)
+    for sysid in mpstate.sysid_outputs:
+        m = mpstate.sysid_outputs[sysid]
+        rin.append(m.fd)
+    if rin == []:
+        time.sleep(0.0001)
+        return
+    for fd in mpstate.select_extra:
+        rin.append(fd)
+    try:
+        (rin, win, xin) = select.select(rin, [], [], mpstate.settings.select_timeout)
+    except select.error:
+        return
+    if mpstate is None:
+        return
+    for fd in rin:
+        if mpstate is None:
+              return
         for master in mpstate.mav_master:
-            if master.fd is None:
-                if master.port.inWaiting() > 0:
+              if fd == master.fd:
                     process_master(master)
-
-        periodic_tasks()
-
-        rin = []
-        for master in mpstate.mav_master:
-            if master.fd is not None and not master.portdead:
-                rin.append(master.fd)
+                    if mpstate is None:
+                          return
+                    return
         for m in mpstate.mav_outputs:
-            rin.append(m.fd)
+            if fd == m.fd:
+                process_mavlink(m)
+                if mpstate is None:
+                      return
+                return
         for sysid in mpstate.sysid_outputs:
             m = mpstate.sysid_outputs[sysid]
-            rin.append(m.fd)
-        if rin == []:
-            time.sleep(0.0001)
-            continue
-
-        for fd in mpstate.select_extra:
-            rin.append(fd)
-        try:
-            (rin, win, xin) = select.select(rin, [], [], mpstate.settings.select_timeout)
-        except select.error:
-            continue
-
-        if mpstate is None:
-            return
-
-        for fd in rin:
-            if mpstate is None:
-                  return
-            for master in mpstate.mav_master:
-                  if fd == master.fd:
-                        process_master(master)
-                        if mpstate is None:
-                              return
-                        continue
-            for m in mpstate.mav_outputs:
-                if fd == m.fd:
-                    process_mavlink(m)
-                    if mpstate is None:
-                          return
-                    continue
-
-            for sysid in mpstate.sysid_outputs:
-                m = mpstate.sysid_outputs[sysid]
-                if fd == m.fd:
-                    #rocess_mavlink(m)
-                    if mpstate is None:
-                          return
-                    continue
-
-            # this allow modules to register their own file descriptors
-            # for the main select loop
-            if fd in mpstate.select_extra:
-                try:
-                    # call the registered read function
-                    (fn, args) = mpstate.select_extra[fd]
-                    fn(args)
-                except Exception as msg:
-                    if mpstate.settings.moddebug == 1:
-                        print(msg)
-                    # on an exception, remove it from the select list
-                    mpstate.select_extra.pop(fd)
-
+            if fd == m.fd:
+                #rocess_mavlink(m)
+                if mpstate is None:
+                      return
+                return
+        # this allow modules to register their own file descriptors
+        # for the main select loop
+        if fd in mpstate.select_extra:
+            try:
+                # call the registered read function
+                (fn, args) = mpstate.select_extra[fd]
+                fn(args)
+            except Exception as msg:
+                if mpstate.settings.moddebug == 1:
+                    print(msg)
+                # on an exception, remove it from the select list
+                mpstate.select_extra.pop(fd)
             ########################## Jorge Cano CODE ##########################
 
         Rollvalue = mpstate.status.msgs['ATTITUDE'].roll    #rad
@@ -866,6 +871,9 @@ def main_loop():
 
 def input_loop():
     '''wait for user input'''
+    global operation_takeoff
+    global time_init_operation_takeoff
+    global time_end_operation_takeoff
     while mpstate.status.exit != True:
         try:
             if mpstate.status.exit != True:
@@ -877,11 +885,20 @@ def input_loop():
                     mpstate.tcp.writeln(line)
                 else:
                     line = input(mpstate.rl.prompt)
+            if line == 'takeoff':
+                print("Detecto takeoff")
+                operation_takeoff=True
+                time_init_operation_takeoff = int(round(time.time() * 1000))
+                time_end_operation_takeoff = time_init_operation_takeoff + 5000
+                print(time_end_operation_takeoff)
+                mpstate.input_queue.put("arm throttle")
+                return
+            if line == 'land':
+                on_air = False
         except EOFError:
             mpstate.status.exit = True
             sys.exit(1)
         mpstate.input_queue.put(line)
-
 
 def run_script(scriptfile):
     '''run a script file'''
@@ -1045,17 +1062,16 @@ def openNavdataChannel():
 
 def sendCMDVel2Vehicle(CMDVel,Pose3D):
     while True:
-        CMDVel2send = CMDVel.getCMDVelData()
 
+        CMDVel2send = CMDVel.getCMDVelData()
         Pose3D2send = Pose3D.getPose3DData()
         NEDvel = body2NED(CMDVel2send, Pose3D2send) # [x,y,z]
         linearXstring = str(NEDvel[0])
         linearYstring = str(NEDvel[1])
         linearZstring = str(NEDvel[2])
 
-        #velocitystring = 'velocity '+ linearXstring + ' ' + linearYstring + ' ' + linearZstring
-        velocitystring = 'velocity 0.01 0 0'
-        #print ('CMDVel :')
+        velocitystring = 'velocity '+ linearXstring + ' ' + linearYstring + ' ' + linearZstring
+
         process_stdin(velocitystring)  # SET_POSITION_TARGET_LOCAL_NED
 
 def sendWayPoint2Vehicle(Pose3D):
@@ -1486,9 +1502,12 @@ if __name__ == '__main__':
     WP_Pose3D = Pose3DI(0,0,0,0,0,0,0,0)
 
     #####################################################################
-
+    global operation_takeoff
+    global on_air
+    operation_takeoff = False
+    on_air = False
     # run main loop as a thread
-    mpstate.status.thread = threading.Thread(target=main_loop, name='main_loop')
+    mpstate.status.thread = threading.Thread(target=listener_loop, name='listener_loop')
     mpstate.status.thread.daemon = True
     mpstate.status.thread.start()
 
@@ -1496,33 +1515,33 @@ if __name__ == '__main__':
 
     #Open an ICE TX communication and leave it open in a parallel threat
 
-    #PoseTheading = threading.Thread(target=openPose3DChannel, args=(PH_Pose3D,), name='Pose_Theading')
-    #PoseTheading.daemon = True
-    #PoseTheading.start()
+    PoseTheading = threading.Thread(target=openPose3DChannel, args=(PH_Pose3D,), name='Pose_Theading')
+    PoseTheading.daemon = True
+    PoseTheading.start()
 
     # Open an ICE RX communication and leave it open in a parallel threat
 
-    #CMDVelTheading = threading.Thread(target=openCMDVelChannel, args=(PH_CMDVel,), name='CMDVel_Theading')
-    #CMDVelTheading.daemon = True
-    #CMDVelTheading.start()
+    CMDVelTheading = threading.Thread(target=openCMDVelChannel, args=(PH_CMDVel,), name='CMDVel_Theading')
+    CMDVelTheading.daemon = True
+    CMDVelTheading.start()
 
     # Open an ICE TX communication and leave it open in a parallel threat
 
-    #CMDVelTheading = threading.Thread(target=openExtraChannel, args=(PH_Extra,), name='Extra_Theading')
-    #CMDVelTheading.daemon = True
-    #CMDVelTheading.start()
+    CMDVelTheading = threading.Thread(target=openExtraChannel, args=(PH_Extra,), name='Extra_Theading')
+    CMDVelTheading.daemon = True
+    CMDVelTheading.start()
 
     # Open an ICE channel empty
 
-    #CMDVelTheading = threading.Thread(target=openNavdataChannel, args=(), name='Navdata_Theading')
-    #CMDVelTheading.daemon = True
-    #CMDVelTheading.start()
+    CMDVelTheading = threading.Thread(target=openNavdataChannel, args=(), name='Navdata_Theading')
+    CMDVelTheading.daemon = True
+    CMDVelTheading.start()
 
     # # Open an MAVLink TX communication and leave it open in a parallel threat
     #
-    #PoseTheading = threading.Thread(target=sendCMDVel2Vehicle, args=(PH_CMDVel,PH_Pose3D,), name='TxCMDVel_Theading')
-    #PoseTheading.daemon = True
-    #PoseTheading.start()
+    PoseTheading = threading.Thread(target=sendCMDVel2Vehicle, args=(PH_CMDVel,PH_Pose3D,), name='TxCMDVel_Theading')
+    PoseTheading.daemon = True
+    PoseTheading.start()
 
 
     # Open an ICE TX communication and leave it open in a parallel threat
@@ -1539,9 +1558,9 @@ if __name__ == '__main__':
 
     # Open an MAVLink TX communication and leave it open in a parallel threat
 
-    #PoseTheading = threading.Thread(target=landDecision, args=(PH_CMDVel,), name='LandDecision2Vehicle_Theading')
-    #PoseTheading.daemon = True
-    #PoseTheading.start()
+    PoseTheading = threading.Thread(target=landDecision, args=(PH_CMDVel,), name='LandDecision2Vehicle_Theading')
+    PoseTheading.daemon = True
+    PoseTheading.start()
 
 
 

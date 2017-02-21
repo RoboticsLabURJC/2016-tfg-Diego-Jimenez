@@ -31,7 +31,6 @@ class Detection():
     def detection(self, image, hmin ,hmax, smin, smax, vmin, vmax):
 
         #------- Thresold Image -------#
-
         rawImage= image
 
         ksize = (5,5)
@@ -87,7 +86,6 @@ class Detection():
 
 
     def execute(self):
-
         droneImage = self.sensor.getImage()
 
         centerGreen, areaGreen = self.detection(droneImage, self.hminG ,self.hmaxG, self.sminG, self.smaxG, self.vminG, self.vmaxG)
@@ -120,11 +118,10 @@ class Detection():
         zPid.setError(zError)
         controlZ = zPid.calcControl()
 
-        #controlX = 0
+        #controlX = 2
         #controlY = 0
         #controlZ = 0
         #controlYaw = 0
-
         # controlX to veloccY and controlY to veloccX
         self.sensor.sendCMDVel(controlX,controlY,controlZ,controlYaw,0,0)
 
