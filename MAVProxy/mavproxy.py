@@ -28,6 +28,7 @@ from MAVProxy.modules.lib import dumpstacks
 from MAVProxy.modules.lib import udp
 from MAVProxy.modules.lib import tcp
 
+import easyiceconfig as EasyIce
 
 from Pose3D import Pose3DI
 from CMDVel import CMDVelI
@@ -734,21 +735,6 @@ def periodic_tasks():
 
 def listener_loop():
     while True:
-        global on_air
-        global operation_takeoff
-        global time_init_operation_takeoff
-        global time_end_operation_takeoff
-        time_now = int(round(time.time() * 1000))
-        if operation_takeoff  and time_now > time_end_operation_takeoff:
-            time_init_operation_takeoff = int(round(time.time() * 1000))
-            time_end_operation_takeoff = time_init_operation_takeoff + 5000
-            operation_takeoff = False
-            on_air = True
-            print("Despegando")
-            mpstate.input_queue.put("takeoff 1")
-        if on_air and time_now > time_end_operation_takeoff:
-            mpstate.input_queue.put("mode guided")
-            on_air = False
         main_loop()
 
 def main_loop():
@@ -763,6 +749,24 @@ def main_loop():
     if mpstate is None or mpstate.status.exit:
         return
         #cmd
+    ####################### Diego Jimenez CODE ###############################
+    global on_air
+    global operation_takeoff
+    global time_init_operation_takeoff
+    global time_end_operation_takeoff
+    time_now = int(round(time.time() * 1000))
+    if operation_takeoff  and time_now > time_end_operation_takeoff:
+        print("Taking off")
+        time_init_operation_takeoff = int(round(time.time() * 1000))
+        time_end_operation_takeoff = time_init_operation_takeoff + 7000
+        operation_takeoff = False
+        on_air = True
+        mpstate.input_queue.put("takeoff 1")
+    if on_air and time_now > time_end_operation_takeoff:
+        mpstate.input_queue.put("mode guided")
+        print("Mode guided on")
+        on_air = False
+    ###########################################################################
     while not mpstate.input_queue.empty():
         line = mpstate.input_queue.get()
         mpstate.input_count += 1
@@ -862,18 +866,12 @@ def main_loop():
 
         #####################################################################
 
-        ######################### Diego Jimenez CODE ############################################
-
-
-
-
-
-
 def input_loop():
     '''wait for user input'''
     global operation_takeoff
     global time_init_operation_takeoff
     global time_end_operation_takeoff
+
     while mpstate.status.exit != True:
         try:
             if mpstate.status.exit != True:
@@ -894,6 +892,7 @@ def input_loop():
                 mpstate.input_queue.put("arm throttle")
                 return
             if line == 'land':
+                print("Orden de aterrizar")
                 on_air = False
         except EOFError:
             mpstate.status.exit = True
@@ -981,7 +980,7 @@ def openCMDVelChannel(CMDVel):
         ic = Ice.initialize(sys.argv)
         adapter = ic.createObjectAdapterWithEndpoints("CMDVelAdapter", "default -p 9997")
         object = CMDVel2Rx
-        print (CMDVel2Rx)
+        print(object)
         adapter.add(object, ic.stringToIdentity("CMDVel"))
         adapter.activate()
         ic.waitForShutdown()
@@ -1069,10 +1068,11 @@ def sendCMDVel2Vehicle(CMDVel,Pose3D):
         linearXstring = str(NEDvel[0])
         linearYstring = str(NEDvel[1])
         linearZstring = str(NEDvel[2])
-
+        angularZstring = str(CMDVel.angularZ*180)
         velocitystring = 'velocity '+ linearXstring + ' ' + linearYstring + ' ' + linearZstring
-
+        angularString = 'setyaw ' + angularZstring + ' 1 1'
         process_stdin(velocitystring)  # SET_POSITION_TARGET_LOCAL_NED
+        process_stdin(angularString)
 
 def sendWayPoint2Vehicle(Pose3D):
 
@@ -1094,21 +1094,24 @@ def sendWayPoint2Vehicle(Pose3D):
 
         #print wayPoint
 
-def landDecision(CMDVel):
+def landDecision(PH_Extra):
 
+    global operation_takeoff
+    global time_init_operation_takeoff
+    global time_end_operation_takeoff
     while True:
-        time.sleep(1)
-        command = CMDVel.getCMDVelData()
-        if (command.linearZ == -1):
-            print ('Lading decision: True')
-            process_stdin('mode land')
-
-            while (command.linearZ == -1):
-                time.sleep(1)
-                command = CMDVel.getCMDVelData()
-
-            print ('Target Lost, recovering trajectory')
-            process_stdin('mode guided')
+        if PH_Extra.landDecision:
+            print("Landing")
+            process_stdin("land")
+            PH_Extra.setLand(False)
+        if PH_Extra.takeOffDecision:
+            print("Takeoff")
+            operation_takeoff=True
+            time_init_operation_takeoff = int(round(time.time() * 1000))
+            time_end_operation_takeoff = time_init_operation_takeoff + 5000
+            print("Arming proppellers")
+            mpstate.input_queue.put("arm throttle")
+            PH_Extra.setTakeOff(False)
 
 def global2cartesian(poseLatLonHei):
 
@@ -1506,6 +1509,7 @@ if __name__ == '__main__':
     global on_air
     operation_takeoff = False
     on_air = False
+    print("Variables a false")
     # run main loop as a thread
     mpstate.status.thread = threading.Thread(target=listener_loop, name='listener_loop')
     mpstate.status.thread.daemon = True
@@ -1558,7 +1562,7 @@ if __name__ == '__main__':
 
     # Open an MAVLink TX communication and leave it open in a parallel threat
 
-    PoseTheading = threading.Thread(target=landDecision, args=(PH_CMDVel,), name='LandDecision2Vehicle_Theading')
+    PoseTheading = threading.Thread(target=landDecision, args=(PH_Extra,), name='LandDecision2Vehicle_Theading')
     PoseTheading.daemon = True
     PoseTheading.start()
 

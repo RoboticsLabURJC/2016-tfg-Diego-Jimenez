@@ -13,16 +13,16 @@ class ExtraI(jderobot.ArDroneExtra):
         self.landDecision = False
         self.takeOffDecision = False
 
-    def land(self):
-
+    def land(self,xxx):
+        self.setLand(True)
         lockLand.acquire()
         landDecision = self.landDecision
         lockLand.release()
 
         return landDecision
 
-    def takeOff(self):
-
+    def takeoff(self,xxx):
+        self.setTakeOff(True)
         lockTakeOff.acquire()
         takeOffDecision = self.takeOffDecision
         lockTakeOff.release()
@@ -30,13 +30,11 @@ class ExtraI(jderobot.ArDroneExtra):
         return takeOffDecision
 
     def setLand(self,decision):
-
         lockLand.acquire()
         self.landDecision = decision
         lockLand.release()
 
     def setTakeOff(self, decision):
-
         lockTakeOff.acquire()
         self.takeOffDecision = decision
         lockTakeOff.release()
