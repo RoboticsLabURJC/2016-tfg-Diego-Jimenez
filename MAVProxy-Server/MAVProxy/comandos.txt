@@ -1,7 +1,0 @@
---Quitar GPS: arm uncheck gps
-
---Arrancar motores : arm throttle
-
---Despegar : takeoff [metros eje y]
-
---Aterrizar: land

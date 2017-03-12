@@ -40,7 +40,6 @@ global time_init_operation_takeoff
 global time_end_operation_takeoff
 global on_air
 
-
 # adding all this allows pyinstaller to build a working windows executable
 # note that using --hidden-import does not work for these modules
 try:
@@ -742,19 +741,21 @@ def main_loop():
     if not mpstate.status.setup_mode and not opts.nowait:
         for master in mpstate.mav_master:
             send_heartbeat(master)
-            #if master.linknum == 0:
-                #print("Waiting for heartbeat from %s" % master.address)
-                #master.wait_heartbeat()
+            if master.linknum == 0:
+                print("Waiting for heartbeat from %s" % master.address)
+                master.wait_heartbeat()
         set_stream_rates()
     if mpstate is None or mpstate.status.exit:
         return
         #cmd
-    ####################### Diego Jimenez CODE ###############################
+
     global on_air
     global operation_takeoff
     global time_init_operation_takeoff
     global time_end_operation_takeoff
+
     time_now = int(round(time.time() * 1000))
+
     if operation_takeoff  and time_now > time_end_operation_takeoff:
         print("Taking off")
         time_init_operation_takeoff = int(round(time.time() * 1000))
@@ -762,11 +763,12 @@ def main_loop():
         operation_takeoff = False
         on_air = True
         mpstate.input_queue.put("takeoff 1")
+
     if on_air and time_now > time_end_operation_takeoff:
         mpstate.input_queue.put("mode guided")
         print("Mode guided on")
         on_air = False
-    ###########################################################################
+
     while not mpstate.input_queue.empty():
         line = mpstate.input_queue.get()
         mpstate.input_count += 1
@@ -775,10 +777,12 @@ def main_loop():
               mpstate.empty_input_count += 1
         for c in cmds:
             process_stdin(c)
+
     for master in mpstate.mav_master:
         if master.fd is None:
             if master.port.inWaiting() > 0:
                 process_master(master)
+
     periodic_tasks()
     rin = []
     for master in mpstate.mav_master:
@@ -818,7 +822,7 @@ def main_loop():
         for sysid in mpstate.sysid_outputs:
             m = mpstate.sysid_outputs[sysid]
             if fd == m.fd:
-                #rocess_mavlink(m)
+                process_mavlink(m)
                 if mpstate is None:
                       return
                 return

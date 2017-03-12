@@ -133,7 +133,7 @@ class CmdlongModule(mp_module.MPModule):
             angle = float(args[0])
             angular_speed = float(args[1])
             angle_mode = float(args[2])
-            #print("ANGLE %s" % (str(angle)))
+            print("ANGLE %s" % (str(angle)))
             self.master.mav.command_long_send(
                 self.settings.target_system,  # target_system
                 mavutil.mavlink.MAV_COMP_ID_SYSTEM_CONTROL, # target_component
@@ -157,7 +157,7 @@ class CmdlongModule(mp_module.MPModule):
             x_mps = float(args[0])
             y_mps = float(args[1])
             z_mps = float(args[2])
-            #print("x:%f, y:%f, z:%f" % (x_mps, y_mps, z_mps))
+            print("x:%f, y:%f, z:%f" % (x_mps, y_mps, z_mps))
 
             self.master.mav.set_position_target_local_ned_send(
                 0,       # time_boot_ms (not used)
