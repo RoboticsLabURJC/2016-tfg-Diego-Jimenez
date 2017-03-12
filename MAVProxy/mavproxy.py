@@ -1072,7 +1072,7 @@ def sendCMDVel2Vehicle(CMDVel,Pose3D):
         linearXstring = str(NEDvel[0])
         linearYstring = str(NEDvel[1])
         linearZstring = str(NEDvel[2])
-        angularZstring = str(CMDVel.angularZ*180)
+        angularZstring = str(CMDVel.angularZ*180/math.pi)
         velocitystring = 'velocity '+ linearXstring + ' ' + linearYstring + ' ' + linearZstring
         angularString = 'setyaw ' + angularZstring + ' 1 1'
         process_stdin(velocitystring)  # SET_POSITION_TARGET_LOCAL_NED
