@@ -134,6 +134,7 @@ class CmdlongModule(mp_module.MPModule):
             angular_speed = float(args[1])
             angle_mode = float(args[2])
             print("ANGLE %s" % (str(angle)))
+
             self.master.mav.command_long_send(
                 self.settings.target_system,  # target_system
                 mavutil.mavlink.MAV_COMP_ID_SYSTEM_CONTROL, # target_component

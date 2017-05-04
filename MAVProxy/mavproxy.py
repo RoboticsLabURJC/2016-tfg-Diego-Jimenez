@@ -28,7 +28,7 @@ from MAVProxy.modules.lib import dumpstacks
 from MAVProxy.modules.lib import udp
 from MAVProxy.modules.lib import tcp
 
-import easyiceconfig as EasyIce
+#import easyiceconfig as EasyIce
 
 from Pose3D import Pose3DI
 from CMDVel import CMDVelI
@@ -52,6 +52,7 @@ try:
             import pyreadline as readline
 except Exception:
       pass
+
 
 if __name__ == '__main__':
       freeze_support()
@@ -484,6 +485,12 @@ def process_stdin(line):
     ######################################################################################################
     if cmd == 'velocity' and len(args) == 4:
         PH_CMDVel = CMDVelI(args[1],args[2],args[3],0,0,0) #1 to avoid indeterminations
+
+
+
+
+
+
     ######################################################################################################
     if not cmd in command_map:
         for (m,pm) in mpstate.modules:
@@ -733,16 +740,18 @@ def periodic_tasks():
             unload_module(m.name)
 
 def main_loop():
+
+    if not mpstate.status.setup_mode and not opts.nowait:
+        for master in mpstate.mav_master:
+            send_heartbeat(master)
+            if master.linknum == 0:
+                print("Waiting for heartbeat from %s" % master.address)
+                master.wait_heartbeat()
+        set_stream_rates()
+
     while True:
-        if not mpstate.status.setup_mode and not opts.nowait:
-            for master in mpstate.mav_master:
-                send_heartbeat(master)
-                if master.linknum == 0:
-                    print("Waiting for heartbeat from %s" % master.address)
-                    master.wait_heartbeat()
-            set_stream_rates()
         if mpstate is None or mpstate.status.exit:
-            cmd
+            return
 
         global on_air
         global operation_takeoff
@@ -771,13 +780,16 @@ def main_loop():
             if len(cmds) == 1 and cmds[0] == "":
                 mpstate.empty_input_count += 1
             for c in cmds:
+                #print(c)
                 process_stdin(c)
 
         for master in mpstate.mav_master:
             if master.fd is None:
                 if master.port.inWaiting() > 0:
                     process_master(master)
+
         periodic_tasks()
+
         rin = []
         for master in mpstate.mav_master:
             if master.fd is not None and not master.portdead:
@@ -789,15 +801,18 @@ def main_loop():
             rin.append(m.fd)
         if rin == []:
             time.sleep(0.0001)
-            return
+            continue
+
         for fd in mpstate.select_extra:
             rin.append(fd)
         try:
             (rin, win, xin) = select.select(rin, [], [], mpstate.settings.select_timeout)
         except select.error:
-            return
+            continue
+
         if mpstate is None:
             return
+
         for fd in rin:
             if mpstate is None:
                 return
@@ -806,20 +821,22 @@ def main_loop():
                     process_master(master)
                     if mpstate is None:
                           return
-                    return
+                    continue
             for m in mpstate.mav_outputs:
                 if fd == m.fd:
                     process_mavlink(m)
                     if mpstate is None:
                         return
-                    return
+                    continue
+
             for sysid in mpstate.sysid_outputs:
                 m = mpstate.sysid_outputs[sysid]
                 if fd == m.fd:
                     process_mavlink(m)
                     if mpstate is None:
                         return
-                    return
+                    continue
+
         # this allow modules to register their own file descriptors
         # for the main select loop
             if fd in mpstate.select_extra:
@@ -848,8 +865,8 @@ def main_loop():
             PH_quat = quaternion.Quaternion([Rollvalue, Pitchvalue, Yawvalue])
             PH_xyz = global2cartesian(PoseLatLonHei)
 
-            print (PH_quat)
-            print (PH_xyz)
+            #print (PH_quat)
+            #print (PH_xyz)
 
             data = jderobot.Pose3DData()
             data.x = PH_xyz['x']
@@ -860,7 +877,7 @@ def main_loop():
             data.q1 = PH_quat.__getitem__(1)
             data.q2 = PH_quat.__getitem__(2)
             data.q3 = PH_quat.__getitem__(3)
-            print(data)
+            #print(data)
             PH_Pose3D.setPose3DData(data)
 
         #####################################################################
@@ -922,7 +939,7 @@ def openPose3DChannel(Pose3D):
     status = 0
     ic = None
     Pose2Tx = Pose3D #Pose3D.getPose3DData()
-    print(Pose3D)
+    #print(Pose3D)
     try:
         ic = Ice.initialize(sys.argv)
         adapter = ic.createObjectAdapterWithEndpoints("Pose3DAdapter", "default -p 9998")
@@ -1063,18 +1080,18 @@ def sendCMDVel2Vehicle(CMDVel,Pose3D):
 
         CMDVel2send = CMDVel.getCMDVelData()
         Pose3D2send = Pose3D.getPose3DData()
-        print(Pose3D2send)
+        #print(Pose3D2send)
         NEDvel = body2NED(CMDVel2send, Pose3D2send) # [x,y,z]
         linearXstring = str(NEDvel[0])
         linearYstring = str(NEDvel[1])
         linearZstring = str(NEDvel[2])
 
         angular = Pose3D2send.q3 + CMDVel.angularZ
-        if angular > math.pi:
-            angular = angular - 2*math.pi
-        elif angular < -math.pi:
-            angular = angular + 2*math.pi
-        angularZstring = str(angular*180/math.pi)
+        if angular > 1:
+            angular = angular - 2
+        elif angular < -1:
+            angular = angular + 2
+        angularZstring = str(angular*180)
 
         velocitystring = 'velocity '+ linearXstring + ' ' + linearYstring + ' ' + linearZstring
         angularString = 'setyaw ' + angularZstring + ' 1 0'
