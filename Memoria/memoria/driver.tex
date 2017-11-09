@@ -1,0 +1,29 @@
+El driver MavLinkServer es quien va a mediar entre las aplicaciones de JdeRobot y el dron con sus sensores y actuadores físicos. De ésta manera las aplicaciones pueden correr en máquinas distintas, no obligatoriamente abordo, y pueden estar implementadas en distintos lenguajes de programación. Estas ventajas vienen de utilizar la división habitual en JdeRobot entre componentes drivers y componentes aplicación. La comunicación será vía WIFI desde el Intel Computer Stick y el mando, ya que debido a un requerimiento que se esta realizando por parte del equipo de 3DR, es obligatorio realizar la conexión con el 3DR Solo dron \footnote{\url{https://discuss.dronekit.io/t/how-to-connect-to-3dr-solo-drone-using-only-pc-without-using-the-rc/412}}.
+
+A continuación vamos a dividir en distintas fases el contenido de este driver y su ejecución:
+
+\begin{itemize}
+\item Script de arranque arranque del servidor.
+\item Programa principal, en nuestra aplicación recibe el nombre de mavproxy.
+\item Modulos MavLink.
+\item Integridad con JdeRobot.
+\end{itemize}
+
+\section{Script de arranque}
+
+El script de arranque se encargara de ejecutar todos los comandos previos y el servidor. El script se encuentra en MAVProxy/MAVProxyWinLAN.sh, deberemos averiguar la IP que levanta el dron, en nuestro caso, con el 3DR Solo, dicha IP la levanta el mando como hemos comentado en la introduccion de este capitulo. Deberemos modificar el script con la IP del dron a la que nos hayamos conectado y ejecutarlo sin parametros adicionales. El fichero README del repositorio contiene una descripción mas detallada de un ejemplo de ejecución.
+En dicho script lanzaremos la carga de los modulos que nos proporciona MavLink oficialmente en su repositorio oficial. 
+\footnote{\url{https://github.com/ArduPilot/MAVProxy}}. 
+
+Se necesita tener preinstalado tanto pyserial como una versión de pyvmavlink superior a la 1.1.50. Se realiza una descarga de todos los modulos, construye un directorio llamado MavProxy.egg en /home/USER/.local/python3.5/site-packages con el fin de tener almacenados todos los paquetes necesarios y con permisos suficientes. 
+
+AQUI DEBERIA METER UN TREE DE LA ESTRUCTURA DE COMO QUEDAN LOS DIRECTORIOS POR DEBAJO DEL .EGG
+
+
+
+
+\section{MavProxy}
+
+\section{Modulos MavLink}
+
+\section{Integridad con JdeRobot}
