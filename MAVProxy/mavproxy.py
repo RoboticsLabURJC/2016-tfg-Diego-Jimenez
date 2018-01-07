@@ -10,7 +10,7 @@ Released under the GNU GPL version 3 or later
 import sys, os, time, socket, signal
 import fnmatch, errno, threading
 import serial, select
-import queue as Queue
+import Queue
 import imp
 import traceback
 import select
@@ -20,6 +20,9 @@ import Ice
 import jderobot
 import multiprocessing
 import time
+import sys
+import config
+import comm
 
 from MAVProxy.modules.lib import textconsole
 from MAVProxy.modules.lib import rline
@@ -28,7 +31,7 @@ from MAVProxy.modules.lib import dumpstacks
 from MAVProxy.modules.lib import udp
 from MAVProxy.modules.lib import tcp
 
-#import easyiceconfig as EasyIce
+import easyiceconfig as EasyIce
 
 from Pose3D import Pose3DI
 from CMDVel import CMDVelI
@@ -935,18 +938,19 @@ def run_script(scriptfile):
 
 ########################## Jorge Cano CODE ##########################
 
-def openPose3DChannel(Pose3D):
+def openPose3DChannel(Pose3D,jdrc):
     status = 0
     ic = None
     Pose2Tx = Pose3D #Pose3D.getPose3DData()
-    #print(Pose3D)
+    print(Pose3D)
     try:
-        ic = Ice.initialize(sys.argv)
-        adapter = ic.createObjectAdapterWithEndpoints("Pose3DAdapter", "default -p 9998")
-        object = Pose2Tx
-        adapter.add(object, ic.stringToIdentity("Pose3D"))
-        adapter.activate()
-        ic.waitForShutdown()
+        #ic = Ice.initialize(sys.argv)
+        #adapter = ic.createObjectAdapterWithEndpoints("Pose3DAdapter", "default -p 9998")
+        pose = jdrc.getPose3dClient("UAVViewer.Pose3D")
+        #object = Pose2Tx
+        #adapter.add(object, ic.stringToIdentity("Pose3D"))
+        #adapter.activate()
+        #ic.waitForShutdown()
     except:
         traceback.print_exc()
         status = 1
@@ -961,19 +965,20 @@ def openPose3DChannel(Pose3D):
 
     sys.exit(status)
 
-def openPose3DChannelWP(Pose3D):
+def openPose3DChannelWP(Pose3D,jdrc):
 
     status = 0
     ic = None
     Pose2Rx = Pose3D #Pose3D.getPose3DData()
     try:
-        ic = Ice.initialize(sys.argv)
-        adapter = ic.createObjectAdapterWithEndpoints("Pose3DAdapter", "default -p 9994")
-        object = Pose2Rx
+        #ic = Ice.initialize(sys.argv)
+        #adapter = ic.createObjectAdapterWithEndpoints("Pose3DAdapter", "default -p 9994")
+        #object = Pose2Rx
+        print "a"
         #print (object.getPose3DData())
-        adapter.add(object, ic.stringToIdentity("Pose3D"))
-        adapter.activate()
-        ic.waitForShutdown()
+        #adapter.add(object, ic.stringToIdentity("Pose3D"))
+        #adapter.activate()
+        #ic.waitForShutdown()
     except:
         traceback.print_exc()
         status = 1
@@ -988,18 +993,12 @@ def openPose3DChannelWP(Pose3D):
 
     sys.exit(status)
 
-def openCMDVelChannel(CMDVel):
+def openCMDVelChannel(CMDVel,jdrc):
     status = 0
     ic = None
     CMDVel2Rx = CMDVel #CMDVel.getCMDVelData()
     try:
-        ic = Ice.initialize(sys.argv)
-        adapter = ic.createObjectAdapterWithEndpoints("CMDVelAdapter", "default -p 9997")
-        object = CMDVel2Rx
-        print(object)
-        adapter.add(object, ic.stringToIdentity("CMDVel"))
-        adapter.activate()
-        ic.waitForShutdown()
+        cmdvel = jdrc.getCMDVelClient("UAVViewer.CMDVel")
     except:
         traceback.print_exc()
         status = 1
@@ -1014,18 +1013,13 @@ def openCMDVelChannel(CMDVel):
 
     sys.exit(status)
 
-def openExtraChannel(Extra):
+def openExtraChannel(Extra,jdrc):
 
     status = 0
     ic = None
     Extra2Tx = Extra
     try:
-        ic = Ice.initialize(sys.argv)
-        adapter = ic.createObjectAdapterWithEndpoints("ExtraAdapter", "default -p 9995")
-        object = Extra2Tx
-        adapter.add(object, ic.stringToIdentity("Extra"))
-        adapter.activate()
-        ic.waitForShutdown()
+        extra = jdrc.getArDroneExtraClient("UAVViewer.Extra")
     except:
         traceback.print_exc()
         status = 1
@@ -1048,19 +1042,20 @@ class NavdataI(jderobot.Navdata):
         data = jderobot.NavdataData()
         return data
 
-def openNavdataChannel():
+def openNavdataChannel(jdrc):
 
     status = 0
     ic = None
     Navdata2Tx = NavdataI()
 
     try:
-        ic = Ice.initialize(sys.argv)
-        adapter = ic.createObjectAdapterWithEndpoints("NavdataAdapter", "default -p 9996")
-        object = Navdata2Tx
-        adapter.add(object, ic.stringToIdentity("Navdata"))
-        adapter.activate()
-        ic.waitForShutdown()
+        navdata = jdrc.getNavdataClient("UAVViewer.Navdata")
+        #ic = Ice.initialize(sys.argv)
+        #adapter = ic.createObjectAdapterWithEndpoints("NavdataAdapter", "default -p 9996")
+        #object = Navdata2Tx
+        #adapter.add(object, ic.stringToIdentity("Navdata"))
+        #adapter.activate()
+        #ic.waitForShutdown()
     except:
         traceback.print_exc()
         status = 1
@@ -1548,28 +1543,32 @@ if __name__ == '__main__':
     mpstate.status.thread.start()
 
     ########################## Jorge Cano CODE ##########################
+    cfg = config.load(sys.argv[1])
+
+    #starting comm
+    jdrc= comm.init(cfg, 'UAVViewer')
 
     #Open an ICE TX communication and leave it open in a parallel threat
 
-    PoseTheading = threading.Thread(target=openPose3DChannel, args=(PH_Pose3D,), name='Pose_Theading')
+    PoseTheading = threading.Thread(target=openPose3DChannel, args=(PH_Pose3D,jdrc), name='Pose_Theading')
     PoseTheading.daemon = True
     PoseTheading.start()
 
     # Open an ICE RX communication and leave it open in a parallel threat
 
-    CMDVelTheading = threading.Thread(target=openCMDVelChannel, args=(PH_CMDVel,), name='CMDVel_Theading')
+    CMDVelTheading = threading.Thread(target=openCMDVelChannel, args=(PH_CMDVel,jdrc), name='CMDVel_Theading')
     CMDVelTheading.daemon = True
     CMDVelTheading.start()
 
     # Open an ICE TX communication and leave it open in a parallel threat
 
-    CMDVelTheading = threading.Thread(target=openExtraChannel, args=(PH_Extra,), name='Extra_Theading')
+    CMDVelTheading = threading.Thread(target=openExtraChannel, args=(PH_Extra,jdrc), name='Extra_Theading')
     CMDVelTheading.daemon = True
     CMDVelTheading.start()
 
     # Open an ICE channel empty
 
-    CMDVelTheading = threading.Thread(target=openNavdataChannel, args=(), name='Navdata_Theading')
+    CMDVelTheading = threading.Thread(target=openNavdataChannel, args=(jdrc,), name='Navdata_Theading')
     CMDVelTheading.daemon = True
     CMDVelTheading.start()
 
@@ -1582,7 +1581,7 @@ if __name__ == '__main__':
 
     # Open an ICE TX communication and leave it open in a parallel threat
 
-    PoseTheading = threading.Thread(target=openPose3DChannelWP, args=(WP_Pose3D,), name='WayPoint_Theading')
+    PoseTheading = threading.Thread(target=openPose3DChannelWP, args=(WP_Pose3D,jdrc), name='WayPoint_Theading')
     PoseTheading.daemon = True
     PoseTheading.start()
 
