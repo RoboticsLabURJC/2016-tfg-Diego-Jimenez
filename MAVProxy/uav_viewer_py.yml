@@ -1,31 +1,30 @@
-UAVViewer:
-  Camera:
-    Server: 1 # 0 -> Deactivate, 1 -> Ice , 2 -> ROS
-    Proxy: "Camera:tcp -h localhost -p 9000"
-    Format: RGB8
-    Topic: "/IntrorobROS/image_raw"
-    Name: IntrorobCamera
+Camera:
+  Server: 1 # 0 -> Deactivate, 1 -> Ice , 2 -> ROS
+  Proxy: "default -h 0.0.0.0 -p 9999"
+  Format: RGB8
+  Topic: "/MavLink/image_raw"
+  Name: MavLinkCamera
 
-  Pose3D:
-    Server: 1 # 0 -> Deactivate, 1 -> Ice , 2 -> ROS
-    Proxy: "Pose3D:tcp -h localhost -p 9000"
-    Topic: "/IntrorobROS/Pose3D"
-    Name: IntrorobPose3d
+Pose3D:
+  Server: 1 # 0 -> Deactivate, 1 -> Ice , 2 -> ROS
+  Proxy: "default -h 0.0.0.0 -p 9998"
+  Topic: "/MavLink/Pose3D"
+  Name: MavLinkPose3d
 
-  CMDVel:
-    Server: 1 # 0 -> Deactivate, 1 -> Ice , 2 -> ROS
-    Proxy: "CMDVel:tcp -h localhost -p 9000"
-    Topic: "/IntrorobROS/CMDVel"
-    Name: IntrorobCMDVel
+CMDVel:
+  Server: 1 # 0 -> Deactivate, 1 -> Ice , 2 -> ROS
+  Proxy: "default -h 0.0.0.0 -p 9997"
+  Topic: "/MavLink/CMDVel"
+  Name: MavLinkCMDVel
 
-  Navdata:
-    Server: 1 # 0 -> Deactivate, 1 -> Ice , 2 -> ROS
-    Proxy: "Navdata:tcp -h localhost -p 9000"
-    Topic: "/IntrorobROS/Navdata"
-    Name: IntrorobNavdata
+Navdata:
+  Server: 1 # 0 -> Deactivate, 1 -> Ice , 2 -> ROS
+  Proxy: "default -h 0.0.0.0 -p 9996"
+  Topic: "/MavLink/Navdata"
+  Name: MavLinkNavdata
 
-  Extra:
-    Server: 1 # 0 -> Deactivate, 1 -> Ice , 2 -> ROS
-    Proxy: "Extra:tcp -h localhost -p 9000"
-    Topic: "/IntrorobROS/Extra"
-    Name: IntrorobExtra
+Extra:
+  Server: 1 # 0 -> Deactivate, 1 -> Ice , 2 -> ROS
+  Proxy: "default -h 0.0.0.0 -p 9995"
+  Topic: "/MavLink/Extra"
+  Name: MavLinkExtra
