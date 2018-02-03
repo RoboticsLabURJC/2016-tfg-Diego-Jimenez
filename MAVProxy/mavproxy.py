@@ -766,7 +766,7 @@ def main_loop():
         if operation_takeoff  and time_now > time_end_operation_takeoff:
             print("Taking off")
             time_init_operation_takeoff = int(round(time.time() * 1000))
-            time_end_operation_takeoff = time_init_operation_takeoff + 7000
+            time_end_operation_takeoff = time_init_operation_takeoff + 5000
             operation_takeoff = False
             on_air = True
             mpstate.input_queue.put("takeoff 1")
@@ -902,17 +902,17 @@ def input_loop():
                     mpstate.tcp.writeln(line)
                 else:
                     line = input(mpstate.rl.prompt)
-            if line == 'takeoff':
-                print("Detecto takeoff")
-                operation_takeoff=True
-                time_init_operation_takeoff = int(round(time.time() * 1000))
-                time_end_operation_takeoff = time_init_operation_takeoff + 5000
-                print(time_end_operation_takeoff)
-                mpstate.input_queue.put("arm throttle")
-                return
-            if line == 'land':
-                print("Orden de aterrizar")
-                on_air = False
+            #if line == 'takeoff':
+            #    print("Detecto takeoff")
+            #    operation_takeoff=True
+            #    time_init_operation_takeoff = int(round(time.time() * 1000))
+            #    time_end_operation_takeoff = time_init_operation_takeoff + 5000
+            #    print(time_end_operation_takeoff)
+            #    mpstate.input_queue.put("arm throttle")
+            #    return
+            #if line == 'land':
+            #    print("Orden de aterrizar")
+            #    on_air = False
         except EOFError:
             mpstate.status.exit = True
             sys.exit(1)
@@ -1107,6 +1107,9 @@ def openNavdataChannel(cfg):
     sys.exit(status)
 
 def sendCMDVel2Vehicle(CMDVel,Pose3D):
+    absolute = 0
+    relative = 1
+
     while True:
 
         CMDVel2send = CMDVel.getCMDVelData()
@@ -1117,15 +1120,22 @@ def sendCMDVel2Vehicle(CMDVel,Pose3D):
         linearYstring = str(NEDvel[1])
         linearZstring = str(NEDvel[2])
 
-        angular = Pose3D2send.q3 + CMDVel.angularZ
-        if angular > 1:
-            angular = angular - 2
-        elif angular < -1:
-            angular = angular + 2
-        angularZstring = str(angular*180)
+        #CMDVel.angularZ -1 y 1
+
+        angular = CMDVel.angularZ
+
+        if angular >= 0:
+            direction = str(1)
+        else:
+            angular = -angular
+            direction = str(-1)
+
+        angularZstring = str(angular*30)
+
+        movement = str(relative)
 
         velocitystring = 'velocity '+ linearXstring + ' ' + linearYstring + ' ' + linearZstring
-        angularString = 'setyaw ' + angularZstring + ' 1 0'
+        angularString = 'setyaw ' + angularZstring + ' ' + direction + ' ' + movement
 
         process_stdin(velocitystring)  # SET_POSITION_TARGET_LOCAL_NED
         process_stdin(angularString)
