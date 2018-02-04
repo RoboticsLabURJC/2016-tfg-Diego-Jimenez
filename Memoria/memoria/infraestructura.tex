@@ -8,8 +8,21 @@ Para este desarrollo se ha elegido el dron 3DR Solo distribuido por la empresa n
   \label{fig:3drsolodrone}
 \end{figure}
 
+La CPU que tiene este dron es la ArduIMU,\footnote{\url{https://3dr.com/support/articles/arduimu_v3_kit/}}, es una tarjeta de Unidad de Medida Inercial que integra un procesador compatible con Arduino y que capaz de ejecutar Attitude Heading Reference System (AHRS), basado en el algoritmo DCM (Direct Cosine Matrix)de Bill Premerlani.
 
-\cleardoublepage
+La tarjeta consta de un acelerómetro de 3 ejes y tres sensores giroscópicos, un regulador de tensión dual (3.3V y 5V), un puerto de GPS, un Atmega328 @ 16MHz (como el Arduino Duemilanova) y 3 LEDs de estado.
+
+Es importante aclara que la ArduIMU\ref{fig:arduimu} no es ninguna placa de navegación o piloto automático, sólo una placa de orientación y se puede utilizar en cualquier cosa en la que deseemos conocer su orientación con respecto al suelo – barcos, coches, aviones, …
+
+\begin{figure}[H]
+  \centering
+  \includegraphics[scale=1]{imagenes/arduimutrasera.jpg}
+  \caption{ArduIMU}
+  \label{fig:arduimu}
+\end{figure}
+
+Cuenta con una MPU-6000 que integra un giroscopio y acelerómetro de 3 ejes y se comunica mediante el bus SPI, un magnetómetro HMC-5883L conectado mediante I2C y un Arduino Atmega328 de 16Mhz.
+
 \subsection{Placa estabilizadora Pixhawk}
 
 Esta placa se trata de un desarrollo específico creado entre la "Pixhawk open hardware community" en colaboración con 3D Robotics y que vio como primer destinatario el 3DR Solo. Ofrece un interfaz que se apoya en comandos llamado MAVLink. A través de estos comandos se le puede también enviar órdenes al piloto automático quien las ejecutará más adelante trataremos el protocolo MAVLink en profundidad. El único modo de conectar con el 3DR Solo será a traves del mando, debido a que únicamente el mando es capaz de levantar la dirección IP a la que poder conectarse a ella. En posteriores evoluciones de la versión que controlan tanto el dron como el mando, desde los foros oficiales de 3DR \footnote{\url{https://3drpilots.com/threads/connecting-directly-to-the-pixhawk-2-on-a-solo.7926/}}, comentan que ya se aborda la solución de que sea el propio dron quien levante la dirección IP a la cual poder conectar y no tener que depender del enlace del mando.
@@ -131,7 +144,7 @@ Java, .Net languages, Objective-C, Python, PHP y Ruby, en la mayoría de los sis
 JdeRobot utiliza ICE para la comunicación entre sus nodos, por lo tanto, la tarea de leer
 los valores de un sensor u órdenes de comando a un robot son tan simples como ejecutar un método de un objeto en la aplicación. Una ventaja significativa es la posibilidad de desarrollar aplicaciones independientes del contexto. Un programador puede desarrollar un controlador en C ++ para un robot particular que está incrustado en el robot, por otro lado, otro desarrollador puede desarrollar una aplicación para el procesamiento de imágenes en Python que se ejecuta en una PC. Mediante ICE podemos usar estas dos aplicaciones, que originalmente eran independientes, como un solo aplicación sin tener que preocuparse por las comunicaciones de bajo nivel. Con esto podemos desarrollar aplicaciones modulares de gran complejidad sin esfuerzo adicional.
 
-La conexión entre el driver y las aplicaciones de control, como la prpia herraiente de teleoperacion, se realiza usando este middleware.
+La conexión entre el driver y las aplicaciones de control, como la propia herramienta de teleoperacion, se realiza usando este \textit{middleware}.
 
 \section{Python}
 \label{sec:python}
