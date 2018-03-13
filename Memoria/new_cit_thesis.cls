@@ -1011,7 +1011,7 @@
      \vspace*{3cm}
      
      
-     Curso Académico  2016/2017
+     Curso Académico  2017/2018
    \end{center}
    \vspace*{.5in}
  \end{titlepage}}
