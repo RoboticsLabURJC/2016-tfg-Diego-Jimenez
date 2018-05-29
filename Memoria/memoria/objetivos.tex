@@ -1,46 +1,25 @@
 \section{Problemas a abordar}
 
-Los objetivos de este trabajo fin de grado es crear un driver en la plataforma software
-JdeRobot para drones que utilicen como interfaz de comunicación MAVLink. Para
-abordar el problema lo hemos divido en:
+El principal objetivo de este trabajo fin de grado es dar soporte dentro de la plataforma software
+JdeRobot a drones que utilicen el protocolo MAVLink para comunicarse con la controladora a bordo. Este problema lo hemos divido varios subobjetivos:
 
 \begin{enumerate}
-\item Preparación del hardware necesario.
-\item Desarrollar driver para pilotar drones en una interfaz de nivel medio. Se comunicara con el dron usando el protocolo MavLink y se usará el interfaz de nivel medio que facilita JdeRobot llamado CMDVel.
-\item Desarrollar una herramienta que permita pilotar los drones con interfaz de nivel medio en python de manera más intuitiva. Esta herramienta es una evolución del interfaz ya existente del UavViewer que facilita JdeRobot.
-\item Experimentos en dron real. Conectaremos nuestro 3DR Solo tanto al driver MavLinkServer, que nos facilitara la comunicacion y a la herramienta UavViewer que nos permitira pilotar.
+\item Desarrollar un driver para pilotar drones usando una interfaz de nivel medio (comandos de velocidad). Se comunicará con el dron usando el protocolo MavLink y ofrecerá el interfaz de nivel medio que ya existe en JdeRobot para manejar drones llamado CMDVel.
+\item Desarrollar una herramienta que permita pilotar los drones usando interfaz de nivel medio en python de manera intuitiva. Esta herramienta será una evolución mejorada de la ya existente que facilita JdeRobot.
+\item Experimentos en dron real. Validaremos experimentalmente ambos desarrollos con un drone 3DR Solo, tanto el driver MavLinkServer, que nos facilitara la comunicación, como la herramienta UavViewer renovada que nos permitira pilotarlo.
 \end{enumerate}
 
 
 \section{Requisitos}
 
-Para abordar con éxito los puntos expuestos anteriormente debemos cubrir los siguientes requisitos:
-
 \begin{enumerate}
 \item Preparación del hardware necesario:
-	\begin{enumerate}[label=\alph*]	
-    \item Compra del hardware necesario:
-    	\begin{itemize}
-   	 	\item 3DR Solo dron.
-    	\item Webcam.
-    	\item Intel Computer Stick.
-    	\item Batería externa.
-    	\end{itemize}
-    \item Instalación de JdeRobot en Intel Computer Stick.
-    \item Pruebas de vuelo con todo el equipamiento a bordo del 3DR Solo y pilotaje externo.
-	\end{enumerate}
 \item MavLinkServer
 	\begin{enumerate}[label=\alph*]	
     \item Comunicación con el dron.
     \item Administración de los modos de vuelo.
     \item Fases de despegue y aterrizaje automáticas.
     \item Envio de comandos de velocidad al dron.
-	\end{enumerate}
-\item UavViewerPy
-	\begin{enumerate}[label=\alph*]	
-    \item Comunicación con MavLinkServer.
-    \item Ordenes de despegue y aterrizaje.
-    \item Envio de comandos de velocidad a MavLinkServer mediante 2 joysticks.
 	\end{enumerate}
 \item Experimentos en dron real.
 	\begin{enumerate}[label=\alph*]	
@@ -56,20 +35,37 @@ Para abordar con éxito los puntos expuestos anteriormente debemos cubrir los si
 Cómo requisitos no funcionales debemos:
 
 \begin{enumerate}
-\item Ser multiplataforma.
-\item Utilizar únicamente librerías de software libre.
-\item Ser 100 \% compatibles con los actuales interfaces JdeRobot.
+\item Desarrollados en Python, tanto el driver como la herramienta de teleoperación.
+\item Ser multiplataforma que valga para muchos modelos de drones.
+\item Utilizar únicamente librerías de software libre y ser software libre.
+\item Ser 100 \% compatibles con los actuales interfaces existentes JdeRobot y con la versión 5.6.3 de esa plataforma.
+\item Integración en el repositorio oficial de Jderobot en GitHub para su uso por terceros.
+
 \end{enumerate}
 
-\section{Metodología y plan de trabajo}
+\section{Metodología}
 
 Durante el ciclo de vida del proyecto se han llevado a cabo reuniones semanales de seguimiento con el tutor. En ellas se evaluaban las tareas realizadas y se marcaba qué dirección tomar para la siguiente iteración o incremento. Si los puntos marcados en la anterior reunión no se habían alcanzado se ampliaba el plazo o se discutían otras vías para avanzar. En caso contrario se proponían nuevos subobjetivos.
-Para apoyarnos en nuestro desarrollo hemos utilizado principalmente 4 herramientas:
+
+Para apoyarnos en nuestro desarrollo hemos utilizado principalmente 3 herramientas metodológicas:
 \begin{itemize}
-\item GitHub como forja y control de versiones. En el repositorio \url{https://github.com/RoboticsURJC-students/2016-tfg-Diego-Jimenez}
-se almacenan todos los desarrollos que son objetivo de éste TFG así como ésta memoria. También se encuentran subproductos de desarrollo que han ido surgiendo como apoyo o pruebas a los desarrollos principales.
-\item Contamos también con un mediawiki en JdeRobot dónde hemos actualizado periódicamente nuestros avances acompañados con explicaciones, vídeos e imágenes. \url{http://jderobot.org/Jimenez-tfg}
+\item GitHub como forja y control de versiones. En el repositorio \footnote{\url{https://github.com/RoboticsURJC-students/2016-tfg-Diego-Jimenez}}
+se almacenan todos los desarrollos que son objetivo de este TFG así como esta memoria. También se encuentran subproductos de desarrollo que han ido surgiendo como apoyo o pruebas a los desarrollos principales.
+\item Contamos también con un mediawiki en JdeRobot dónde hemos actualizado periódicamente nuestros avances acompañados con explicaciones, vídeos e imágenes. \footnote{\url{http://jderobot.org/Jimenez-tfg}}
 \item Todos los vídeos del mediawiki han sido compartidos en Youtube.
 \end{itemize}
 
+\section{Plan de trabajo}
+La planificación seguida en el desarrollo ha incluido las siguientes fases:
 
+\begin{itemize}
+\item{Formación:} Comprender las distintas herramientas de JdeRobot y trabajar con ellas, creando programas simples y viendo que funcionaban, así como trabajar con distintos robots reales para tener una toma de contacto con ellos. 
+
+\item{Desarrollo con el protocolo MavLink:} Familiarizarse con sus librerías, interfaces y realizar un desarrollo a partir del código que se encuentra en el repositorio oficial de ArduPilot \footnote{\url{https://github.com/ArduPilot/MAVProxy}}.
+
+\item{Desarrollo de integración con JdeRobot:} Aprovechar al máximo las funciones que puede desempeñar un dron a través del protocolo MavLink y construir un interfaz en JdeRobot que sea capaz de manejarlo.
+
+\item{Desarrollo de una aplicación de control:} Al igual que en el apartado anterior, hay que enviar información al drone en tiempo real diciendo lo que tiene que hacer, pero en este caso dandole ordenes más directas de movimiento a través de un interfaz visual que sea lo más intuitiva posible.
+
+
+\end{itemize}
