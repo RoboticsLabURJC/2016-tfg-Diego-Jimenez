@@ -101,56 +101,6 @@ El flujo de la información y la operación del controlador sigue el siguiente f
 Se puede ver que cada subproceso tiene una tarea pero no tienen la misma carga de trabajo.
 Por esta razón, el tiempo del ciclo de control de cada hilo es diferente. A pesar de la los hilos tienen diferentes ritmos, el módulo funciona con éxito en todas sus diferentes tareas.
 
-MAVLink admite tipos de datos enteros de tamaño fijo, números de punto flotante de precisión simple IEEE 754, matrices de estos tipos de datos (por ejemplo, char [10]) y el campo especial de conversión de MAVLink, que se agrega automáticamente mediante el protocolo. Estos tipos están disponibles:
-
-\begin{multicols}{3}
-\begin{itemize}
-\item char
-\item uint8
-\item int8
-\item uint16
-\item int16
-\item uint32
-\item int32
-\item uint64
-\item int64
-\end{itemize}
-\end{multicols}
-
-Estos paquetes que se envían tienen la estructura de la imagen \ref{fig:protocoloMavlink}, y en la tabla \ref{tablaMAVLinkProtocolo} se hace referencia a cada uno de los campos con una breve explicación de cada uno de ellos:
-
-\clearpage
-\begin{figure}[H]
-  \centering
-  \includegraphics[scale=0.65]{imagenes/protocoloMavLink.png}
-  \caption{Protocolo Mavlink}
-  \label{fig:protocoloMavlink}
-\end{figure}
-
-\begin{center}
-	\label{tablaMAVLinkProtocolo}
-    \begin{tabular}{ | p{2cm} | p{2cm} | p{3cm} | p{5cm} |}
-    \hline
-    Índice del byte & Contenido & Valor & Explicación \\ \hline
-    0 & Señal inicio paquete & 0xFE  & Indica el inicio de un nuevo paquete. \\ \hline
-     1 & Longitud de la carga	& 0 - 255 & Indica la longitud de los datos que lleva. \\ \hline
-     2 & Secuencia del paquete & 0 - 255 & Cada componente cuenta con su propia secuencia. Permite detectar paquetes perdidos. \\
-    \hline
-    3 & ID del sistema & 1 - 255 & ID del sistema emisor. Permite diferenciar MAVs en la misma red. \\
-    \hline
-    4 & ID del componente & 0 - 255	& ID del componente emisor. Permite diferenciar componentes en el mismo sistema, por ejemplo la IMU y la cámara.\\
-    \hline
-    5 & ID del mensaje	& 0 - 255 & Permite identificar los datos del paquete para su correcta decodificación.\\
-    \hline
-     6 to (n+6)  & Datos	& (0 - 255) bytes & Datos del mensaje, depende del ID del mensaje.\\
-    \hline
-   	(n+7) to (n+8) & Checksum &  & El checksum  incluye MAVLINK-CRC-EXTRA (protege el paquete de una decodificación errónea). \\ 
-    \hline
-    \end{tabular}
-\end{center}
-
-
-
 \section{JdeRobot}
 \label{sec:jderobot}
 
