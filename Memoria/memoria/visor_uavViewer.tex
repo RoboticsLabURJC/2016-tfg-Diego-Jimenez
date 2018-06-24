@@ -3,58 +3,94 @@
 Una estación en tierra o GCS (Ground Control Station) es una estación base donde se recibe la
 información generada por un dron y con la que se puede monitorizar y controlar toda la actividad
 de estos vehículos. Estas estaciones pueden ser fijas o móviles y permiten al operario que maneje el dron
-conocer su estado de una manera simple. Uav-viewer es una estación de tierra para drones. Para este
-trabajo se ha focalizado en la visión de los datos generados por Ar.Drone y además permite la teleoperación
-del cuadricóptero. 
+conocer su estado de una manera simple.
 
-En el entorno de JdeRobot existía previamente una interfaz desarrollada en C++, debido a la necesidad de crear un nuevo interfaz que se asemejara más a un mando de un dron real, se decidió implementar una nueva versión. El desarrollo de la aplicación se ha realizado en Python 2.7 para que el entorno de JdeRobot tuviera más variedad en sus aplicaciones, en vez de hacer un cambio en la interfaz gráfica. Las principales diferencias entre ambos visores son el lenguaje y el interfaz gráfico. 
+En el entorno de JdeRobot existía previamente una estación en tierra para drones desarrollada en C++ llamada UAV-Viewer. Debido a la necesidad de crear un nuevo interfaz que se asemejara más a un mando de un dron real, se decidió implementar una nueva versión. Focalizada en la visión de los datos generados por Ar.Drone y además permite la teleoperación del cuadricóptero. 
+
+\section{Diseño}
+
+El desarrollo de la aplicación se ha realizado en Python 2.7 para que el entorno de JdeRobot tuviera más variedad en sus aplicaciones, en vez de hacer un cambio en la interfaz gráfica de la versión de C++. Las principales diferencias entre ambos visores son el lenguaje y el interfaz gráfico. 
 
 Para cumplir con todos los requerimientos que pueden ser necesarios para la plataforma de JdeRobot, el visor que se ha desarrollado es multirobot y se ha probado tanto en simulador como en drones reales, como podría ser Gazebo, ArDrone-Parrot o 3DR Solo Drone.
 
+Además ha servido de validción experimental del driver MavLinkServer puesto que se comunica directamente con él para enviarle comandos de movimiento así como recibir posición del GPS. Estas conexiones se muestran en el diagrama de entradas y salidas de la figura \ref{fig:esquemaUav}
+
 \begin{figure}[H]
   \centering
-  \includegraphics[scale=0.4]{imagenes/Mapageneral.png}
-  \caption{Esquema UAV viewer}
+  \includegraphics[scale=0.4]{imagenes/MapaGeneral.png}
+  \caption{Diagrama de entradas y salidas de UAV viewer}
   \label{fig:esquemaUav}
 \end{figure}
 
-\section{Interfaz Gráfica}
+A continuación se muestra el main de la aplicación en el cual se inicia la conexión con la biblioteca de mensajes COMM, que se sitúa entre nuestra aplicación y tanto los interfaces de mensajes ICE como los interfaces de ROS. Esta biblioteca se ha desarrollado recientemente en JdeRobot como mediador entre las aplicaciones para comunicar indistintamente todos los drivers con la finalidad de abstraer del tipo de comunicación que se realice.
 
-La aplicación ha sido desarrollada en python utilizando para el apartado gráfico la librería
-para interfaces de usuario Qt.
+\begin{lstlisting}[frame=single]
+		#Lectura de la configuracion
+        cfg = config.load(sys.argv[1])11
 
-En la figura \ref{fig:interfazUavViewer} se muestra la interfaz de este componente.
+        #Inicializacion de las comunicaciones
+        jdrc= comm.init(cfg, 'UAVViewer')
 
-\begin{figure}[H]
-  \centering
-  \includegraphics[scale=0.3]{imagenes/Uav_viewer_py.png}
-  \caption{Interfaz}
-  \label{fig:interfazUavViewer}
-\end{figure}
+        camera = jdrc.getCameraClient("UAVViewer.Camera")
+        navdata = jdrc.getNavdataClient("UAVViewer.Navdata")
+        pose = jdrc.getPose3dClient("UAVViewer.Pose3D")
+        cmdvel = jdrc.getCMDVelClient("UAVViewer.CMDVel")
+        extra = jdrc.getArDroneExtraClient("UAVViewer.Extra")
 
-Este interfaz se ha realizado de tal manera que se asemeje lo más posible a los mandos de los drones físicos \ref{fig:mando}. De esta manera desde el joystick izquierdo se controla la altura y el giro (o Yaw) y en el joystick derecho se controlan los ejes X e Y. 
+		#Inicializacion del interfaz grafico y su hebra
+        app = QApplication(sys.argv)
+        frame = MainWindow()
+        frame.setCamera(camera)
+        frame.setNavData(navdata)
+        frame.setPose3D(pose)
+        frame.setCMDVel(cmdvel)
+        frame.setExtra(extra)
+        frame.show()
 
-Tambien hay con 3 botones:
-\begin{itemize}
-\item Take off-Land: sirven para despegar el dron y aterrizar el dron, ese mismo botón cambia el nombre dependiendo el estado del vuelo en el cual nos encontremos.
-\item Stop: Cuadra los joysticks en la posición (0,0) para detener el dron por completo.
-\item Reset: Reinicia los valores por defecto.
-\end{itemize}
 
-\begin{figure}[H]
-  \centering
-  \includegraphics[scale=0.3]{imagenes/mando.jpg}
-  \caption{Mando 3dr Solo Dron}
-  \label{fig:mando}
-\end{figure}
 
-La aplicación tambien implementa de serie 2 utilidades que son la cámara y los sensores. Obtiene las imágenes a través de la interfaz camera, para ello se conecta a la interfaz que ofrece el dron. Con la imagen y los metadatos de ésta recuperados desde el dron,
-UAV viewer la transforma en una imagen compatible con Qt. En función de la cámara activa, la etiqueta donde se muestran las imágenes cambiará su tamaño para ajustar al ancho y alto de la imagen obtenida. La adquisición de imágenes la realiza la hebra encargada de la comunicación con el dron dentro de un bucle de control independiente a la hebra encargada de la interfaz gráfica. De este modo la hebra encargada de la interfaz gráfica consultará a la hebra que controla el dron periódicamente en busca de nuevas imágenes. Cuando las obtenga, refrescará la imagen que muestra en un determinado periodo de tiempo que puede ser configurado.
+        t2 = ThreadGUI(frame)
+        t2.daemon=True
+        t2.start()
+\end{lstlisting}
 
-\section{Hilos de comunicación} 
+\section{Comunicación con drivers} 
 
-Para teleoperar el dron la interfaz gráfica captura los eventos. Estos eventos son creados por los joysticks que enviaran una señal constante con la velocidad indicada para cada unos de los ejes. La interfaz proporcionada por además de ofrecer el envío de comandos al dron para su control, es capaz de proporcionar los datos de los sensores. A estos datos se los conoce como navdata o datos de navegación. El hilo que comunica Uav viewer con el dron hace uso de ésta interfaz para recibir dichos datos. En la figura \ref{fig:sensores} se puede apreciar cómo el hilo que gestiona la interfaz de usuario rellena varios objetos gráficos con los datos sensoriales obtenidos del dron. Podemos ver el porcentaje de batería restante, la altitud del dron, con el indicador de actitud podemos visualizar fácilmente el alabeo y el cabeceo, además cuenta con tres velocímetros para indicar la velocidad medida en cada eje. Si esta velocidad es positiva la etiqueta de la velocidad será verde, mientras que si la velocidad es negativa, la etiqueta será roja.
-Además de para teleoperar el dron y poder visualizar los datos sensoriales de éste.
+Para teleoperar el dron la interfaz gráfica captura los eventos. Estos eventos son creados por los joysticks que enviaran una señal constante con la velocidad indicada para cada unos de los ejes. La interfaz proporcionada por además de ofrecer el envío de comandos al dron para su control, es capaz de proporcionar los datos de los sensores. A estos datos se los conoce como navdata o datos de navegación. El hilo que comunica Uav viewer con el dron hace uso de ésta interfaz para recibir dichos datos. 
+
+\begin{lstlisting}[frame=single]
+ def __init__(self, parent=None):
+        super(MainWindow, self).__init__(parent)
+        self.setupUi(self)
+        self.teleop=TeleopWidget(self,0)
+        self.teleop1=TeleopWidget(self,1)
+        self.tlLayout.addWidget(self.teleop)
+        self.tlLayout_1.addWidget(self.teleop1)
+        self.teleop.setVisible(True)
+
+        self.record = False
+
+        self.updGUI.connect(self.updateGUI)
+
+        self.cameraCheck.stateChanged.connect(self.showCameraWidget)
+        self.sensorsCheck.stateChanged.connect(self.showSensorsWidget)
+
+        self.cameraWidget = CameraWidget(self)
+        self.sensorsWidget = SensorsWidget(self)
+
+        self.cameraCommunicator = Communicator()
+        self.trackingCommunicator = Communicator()
+
+        self.stopButton.clicked.connect(self.stopClicked)
+        self.resetButton.clicked.connect(self.resetClicked)
+        self.takeoffButton.clicked.connect(self.takeOffClicked)
+        self.takeoff = False
+        self.reset = False
+\end{lstlisting}
+
+Existen dos hebras dentro de la aplicación: una controlada por la interfaz de usuario que se encarga de enviar la información de los joysticks y los botones, la otra hebra recibe dicha información, se adecúa dependiendo el estado en el que se encuentre y envía la acción requerida.
+
+La adquisición de imágenes la realiza la hebra encargada de la comunicación con el dron dentro de un bucle de control independiente a la hebra encargada de la interfaz gráfica.  De este modo la hebra encargada de la interfaz gráfica consultará a la hebra que controla el dron periódicamente en busca de nuevas imágenes. Cuando las obtenga, refrescará la imagen que muestra en un determinado periodo de tiempo que puede ser configurado.
 
 \begin{figure}[H]
   \centering
@@ -63,21 +99,61 @@ Además de para teleoperar el dron y poder visualizar los datos sensoriales de �
   \label{fig:uavViewer}
 \end{figure}
 
+
+\section{Interfaz Gráfica}
+
+La aplicación ha sido desarrollada en python utilizando para el apartado gráfico la librería
+para interfaces de usuario Qt. Se ha dividido en tres ventanas: la figura \ref{fig:interfazUavViewer} corresponde a la ventana principal, donde se teleopera el dron. La segunda ventana representa la imagen en tiempo real de la cámara a bordo del dron. Por último, la tercera ventana muestra la información recogida por los sensores del dron, mostrado en la figura \ref{fig:sensores}. A continuación, se describirán las funciones que realiza cada ventana:
+
+La ventana principal se ha realizado de tal manera que se asemeje lo más posible a los mandos de los drones físicos, como se muestra en el mando de la figura \ref{fig:mando}. Las crucetas simulan los joystick de control del dron, de tal forma que el joystick izquierdo controla la altura y el giro (o Yaw), y el joystick derecho controla los ejes X e Y. 
+
+\begin{figure}[H]
+  \centering
+  \includegraphics[scale=0.35]{imagenes/Uav_viewer_py.png}
+  \caption{Interfaz gráfico de uav-viewer.py para teleoperación}
+  \label{fig:interfazUavViewer}
+\end{figure}
+
+A su vez, esta ventana dispone de tres botones:
+\begin{itemize}
+\item \texttt{Take off-Land}: Este botón permite despegar o aterrizar el dron en función del estado de vuelo en el que se encuentre.
+\item \texttt{Stop}: Cuadra los joysticks en la posición (0,0) para detener el dron por completo.
+\item \texttt{Reset}: Reinicia los valores por defecto: si hubiera alguna ventana auxiliar abierta, cámara o sensores, se cerrarían; además, realiza la misma acción del botón \texttt{Stop}; por último, respetaría el estado de vuelo del dron (la orden \texttt{Take off-Land} no se vería alterada por la acción de este botón).
+\end{itemize}
+
+\begin{figure}[H]
+  \centering
+  \includegraphics[scale=0.2]{imagenes/mando.jpg}
+  \caption{Mando físico del 3DR Solo Dron}
+  \label{fig:mando}
+\end{figure}
+
+La aplicación desarrollada también implementa de serie dos utilidades que son la visualización de cámara y de los sensores. Obtiene las imágenes a través de la interfaz camera. Con la imagen y los metadatos de ésta recuperados desde la aplicación que suministra las imágenes, UAV-viewer.py la transforma en una imagen compatible con Qt. En función de la cámara activa, el tamaño de la ventana donde se muestran las imágenes cambiará para ajustarse al ancho y alto de la imagen obtenida.
+
+\begin{figure}[H]
+  \centering
+  \includegraphics[scale=0.4]{imagenes/cameraView.png}
+  \caption{Interfaz gráfico de uav-viewer.py para mostrar la cámara}
+  \label{fig:cameraView}
+\end{figure}
+
+En la figura \ref{fig:sensores} se puede apreciar cómo el hilo que gestiona la interfaz de usuario rellena varios objetos gráficos con los datos sensoriales obtenidos del dron. Podemos ver el porcentaje de batería restante, la altitud del dron, con el indicador de actitud podemos visualizar fácilmente el alabeo y el cabeceo, además cuenta con tres velocímetros para indicar la velocidad medida en cada eje. Si esta velocidad es positiva la etiqueta de la velocidad será verde, mientras que si la velocidad es negativa, la etiqueta será roja.
+Además de para teleoperar el dron y poder visualizar los datos sensoriales de éste.
+
 \begin{figure}[H]
   \centering
   \includegraphics[scale=0.4]{imagenes/sensores.png}
-  \caption{Sensores}
+  \caption{Interfaz gráfico de uav-viewer.py para mostrar los sensores}
   \label{fig:sensores}
 \end{figure}
 
 \section{Fichero de configuración}
 
-Se utilizan ficheros de configuración YAML, es un formato de serialización de datos legible por humanos inspirado en lenguajes como XML, C, Python, Perl, así como el formato para correos electrónicos especificado por el RFC 2822. YAML fue propuesto por Clark Evans en 2001, quien lo diseñó junto a Ingy döt Net y Oren Ben-Kiki.
+La aplicación UAV-Viewer.py creada utiliza ficheros de configuración YAML, es un formato de serialización de datos legible por humanos inspirado en lenguajes como XML, C, Python, Perl, así como el formato para correos electrónicos especificado por el RFC 2822. YAML fue propuesto por Clark Evans en 2001, quien lo diseñó junto a Ingy döt Net y Oren Ben-Kiki.
 
+A continuación se muestra el fichero de configuración en el cuál se determinan en qué puertos especificos se comunica con los driver, MAVLinkServer y cameraServer, para intercambiar datos sensoriales y órdenes de control.
 
-{\scriptsize
-\begin{verbatim}
-
+\begin{lstlisting}[frame=single]
 Camera:
   Server: 1 # 0 -> Deactivate, 1 -> Ice , 2 -> ROS
   Proxy: "default -h 0.0.0.0 -p 9999"
@@ -108,35 +184,4 @@ Extra:
   Proxy: "default -h 0.0.0.0 -p 9995"
   Topic: "/MavLink/Extra"
   Name: MavLinkExtra
-\end{verbatim}}
-
-A continuación se muestra el main de la aplicación en el cual iniciaremos la conexión con el interfaz COMM, este interfaz se situa entre nuestra aplicación y tanto los interfaces ICE como los interfaces de ROS. Este nuevo interfaz se ha desarrollado recientemente en JdeRobot como mediador entre las aplicaciones para comunicar indistintamente todos los drivers con la finalidad de abstraer del tipo de comunicación que se realice.
-
-{\scriptsize
-\begin{verbatim}
-        cfg = config.load(sys.argv[1])
-
-        #starting comm
-        jdrc= comm.init(cfg, 'UAVViewer')
-
-        camera = jdrc.getCameraClient("UAVViewer.Camera")
-        navdata = jdrc.getNavdataClient("UAVViewer.Navdata")
-        pose = jdrc.getPose3dClient("UAVViewer.Pose3D")
-        cmdvel = jdrc.getCMDVelClient("UAVViewer.CMDVel")
-        extra = jdrc.getArDroneExtraClient("UAVViewer.Extra")
-
-        app = QApplication(sys.argv)
-        frame = MainWindow()
-        frame.setCamera(camera)
-        frame.setNavData(navdata)
-        frame.setPose3D(pose)
-        frame.setCMDVel(cmdvel)
-        frame.setExtra(extra)
-        frame.show()
-
-
-
-        t2 = ThreadGUI(frame)
-        t2.daemon=True
-        t2.start()
-\end{verbatim}}
+\end{lstlisting}
