@@ -1,67 +1,25 @@
-\section{Introducción}
+\section{Robótica Aérea}
 
-Se van a usar los terminos VANT(Vehículo aéreo no tripulado) y UAV (Unmanned aerial vehicle) como sinonimo de dron o drone. Un dron es una aeronave que vuela sin tripulación reutilizable, capaz de mantener de manera autónoma un nivel de vuelo controlado y sostenido, y propulsado por un motor de explosión, eléctrico, o de reacción. El diseño de los VANT tiene una amplia variedad de formas, tamaños, configuraciones y características. Históricamente surgen como aviones pilotados remotamente o drones, aumentando a diario el empleo del control autónomo de los VANT. Existen dos variantes: los controlados desde una ubicación remota, y aquellos de vuelo autónomo a partir de planes de vuelo preprogramados a través de automatización dinámica.
+Este Trabajo Fin de Grado se encuadra dentro del campo de los drones y del software para
+robots aéreos. En este capítulo se introducirá este contexto describiendo algunos conceptos, aplicaciones, marco normativo y fundamentos. A continuación, se va a realizar una breve introducción sobre estos aparatos, la historia que tienen, los distintos usos que hay para ellos actualmente, su hardware y software disponible para ellos. También se describirán varios proyectos de RoboticsLab-URJC que forman parte del contexto cercano de este Trabajo de Fin de Grado.
 
+Un dron es una aeronave que vuela sin tripulación reutilizable, capaz de mantener de manera autónoma un nivel de vuelo controlado y sostenido, y propulsado por un motor de explosión, eléctrico, o de reacción. Se van a usar los términos VANT (Vehículo aéreo no tripulado) y UAV (Unmanned aerial vehicle) como sinónimo de dron o drone. El diseño de los VANT tiene una amplia variedad de formas, tamaños, configuraciones y características. Existen dos variantes: los controlados desde una ubicación remota, y aquellos de vuelo autónomo a partir de planes de vuelo preprogramados.
 
-En los siguientes párrafos se va a realizar una breve introducción sobre estos
-aparatos, la historia que tienen, los distintos usos que hay para ellos actualmente, su
-hardware y software disponible para ellos. También se describirán varios proyectos de
-RoboticsLab-URJC que forman parte del contexto cercano de este Trabajo de Fin de
-Grado.
+Los drones tienen un origen militar, ya que permite alcanzar al enemigo a distancia así como evitar pérdidas humanas, mejorando así la estrategia de combate. El ejemplo más antiguo fue desarrollado después de la primera guerra mundial, y se emplearon durante la segunda guerra mundial para entrenar a los operarios de los cañones antiaéreos. 
 
-\subsection{Historia}
-\label{sec:historia}
-
-Un dron no es más que una aeronave no tripulada que se controla remotamente y que, por lo general, se puede decir que siempre ha sido el sueño de todo estratega militar, ya que permite alcanzar al enemigo a distancia así como evitar pérdidas humanas.
-
-Los vehículos aéreos pueden tener diferentes formas, bien tipo avión, tipo helicóptero o incluso otras. Pero los drones no son algo nuevo, el ejemplo más antiguo fue desarrollado después de la primera guerra mundial, y se emplearon durante la segunda guerra mundial para entrenar a los operarios de los cañones antiaéreos. Sin embargo, no es hasta poco más que a finales del siglo XX cuando operan los drones mediante radio control con todas las características de autonomía.
-
-Este sueño comenzó en el 1916, cuando el profesor Archibald Low, un militar científico, diseñó un torpedo aéreo que se manejaba con un sencillo control usando señales de radio. La aeronave fue un fracaso, pero sentó las bases para futuros diseños.
-
-En Vietnam también se usaron otros modelos de dron como el Ryan Firebee\ref{fig:ryanfirebee} que introdujo una nueva idea, la cámara de fotos para espiar al bando contrario.
-
-\begin{figure}[H]
-  \centering
-  \includegraphics[scale=0.65]{imagenes/ryanfirebee.jpg}
-  \caption{Ryan Firebee}
-  \label{fig:ryanfirebee}
-\end{figure}
+Sin embargo, no es hasta poco más que a finales del siglo XX cuando operan los drones mediante radio control con todas las características de autonomía. En Vietnam también se usaron otros modelos de dron como el Ryan Firebee que introdujo una nueva idea, la cámara de fotos para espiar al bando contrario. A su vez, el Gnat fue desarrollado por General Atomics, que introdujo las cámaras de video y con esto empezó una nueva era en el mundo de los drones.
 
 Algunos tienen sistema GPS que les permite volver al punto donde inició de su vuelo. En el futuro se espera que los drones vuelen solos, tomando sus propias decisiones, evitando chocar contra las personas y poder evitar los objetos.
 
 La mayoría de los drones se manejan con radio control, pero pueden ser también manejados y programadas mediante una tablet o un smartphone.
 
-Pero si hay que hablar de una salto en el desarrollo de los drones entonces es necesario mencionar al Gnat\ref{fig:gnat} que fue desarrollado por General Atomics, un contratista de defensa de San Diego, California, EE. UU. que introdujo las cámaras de video y con esto empezó una nueva era en el mundo de los drones.
-
-\begin{figure}[H]
-  \centering
-  \includegraphics[scale=0.4]{imagenes/gnat.jpg}
-  \caption{Gnat}
-  \label{fig:gnat}
-\end{figure}
-
-Para comenzar a hablar del uso de los dron por el público sin duda hay que mencionar a Nikola Tesla quien patentó por primera vez un vehículo no tripulado controlado remotamente al que llamó teleautomation y que hoy es uno de los principios que rige el diseño de un dron.    
-
-Muchas personas encuentran divertido el uso de los dron para fines personales y comerciales como la entrega de paquetes y otros proyectos de Amazon y Google mientras que otros critican fuertemente su uso en la guerra para bombardear a terroristas.
-
-\subsection{Robótica aérea}
-
-La robótica aérea es la rama de la robótica que se encarga del estudio del comportamiento autónomo de los vehículos aéreos no tripulados. En los últimos años, un nuevo reto científico y tecnológico en este área ha sido conseguir que estos vehículos sean totalmente autónomos, es decir, que puedan volar sin la conducción, ni siquiera supervisión, de una persona. A medida que avanza la tecnología y se abaratan los costes, se están integrando en estos vehículos cada vez tecnologías más avanzadas como sistemas de cómputo más poderosos, sensores más ricos en información (cámaras, láseres,...), baterías con mayor autonomía,... El abaratamiento de los drones ha conseguido que cada vez más centros de investigación a lo largo del mundo puedan disponer de estos vehículos consiguiendo así logros que eran impensables hace unos años. Esto está aumentando el campo de aplicación de los VANT, han pasado de utilizarse únicamente en entornos militares a poder utilizarse para servicios forestales, agricultura, medio ambiente, hidrología, cartografía, desastres naturales o geología. 
+La \textit{robótica aérea} es la rama de la robótica que se encarga del estudio del comportamiento autónomo de los vehículos aéreos no tripulados. En los últimos años, un nuevo reto científico y tecnológico en este área ha sido conseguir que estos vehículos sean totalmente autónomos, es decir, que puedan volar sin la conducción, ni siquiera supervisión, de una persona. A medida que avanza la tecnología y se abaratan los costes, se están integrando en estos vehículos cada vez tecnologías más avanzadas como sistemas de cómputo más poderosos, sensores más ricos en información (cámaras, láseres,...), baterías con mayor autonomía,... El abaratamiento de los drones ha conseguido que cada vez más centros de investigación a lo largo del mundo puedan disponer de estos vehículos consiguiendo así logros que eran impensables hace unos años. Esto está aumentando el campo de aplicación de los VANT, han pasado de utilizarse únicamente en entornos militares a poder utilizarse para servicios forestales, agricultura, medio ambiente, hidrología, cartografía, desastres naturales o geología. 
 
 Sin embargo y a pesar de los grandes avances conseguidos en los últimos años, todavía quedan grandes obstáculos que superar. No sólo avances tecnológicos, sino éticos y de regulación por motivos de seguridad. La robótica aérea acaba de empezar a recorrer lo que seguramente sea un gran camino. 
 
-En diciembre de 2013 Amazon sorprendió al mundo demostrando su interés en el envío de paquetes con drones\footnote{\url{https://www.amazon.com/Amazon-Prime-Air/b?node=8037720011}}. Según la propia empresa actualmente se encuentra en la fase de investigación y pruebas con unos VANTs de ocho rotores (optocóptero) que son capaces de levantar cargas de 2.3kg y entregar el paquete en un periodo de 30 minutos desde que el cliente realizase su pedido a través de la web. 
-
-En ese mismo mes, la empresa de envíos DHL mostró su interés en el uso de drones para el reparto de paquetes. Cuentan con unos VANTs con una capacidad de carga de 2.99kg y un radio de acción de 1km. 
-
-No sólo hay interés en el envío de mercancías con estos aparatos, el Ayuntamiento de Madrid, en diciembre de 2013 realizó un simulacro de rescate en el teleférico de Madrid en el que participaron los Bomberos, el Samur y la Policía municipal, en el que se utilizó un VANT de ocho rotores dotado con sensores para detectar gases, temperatura y agentes radioactivos, biológicos y químicos. Equipado con una cámara fue capaz de retransmitir a los puestos de control las imágenes de las victimas involucradas en el rescate.
-
-\subsection{Aplicaciones}
-\label{sec:aplicaciones}
-
 Se utilizan para múltiples tareas, desde tareas de vigilancia, fotografía, retransmisiones televisivas, agricultura, ocio y muchas más tareas, ya que cada poco se descubre una nueva forma de utilizar los drones.
 
-Se pueden aplicar en ambientes de alta toxicidad química y radiológicos en desastres tipo Chernóbil, en los que sea necesario tomar muestras con alto peligro de vidas humanas y realizar tareas de control de ambiente. Las aeronaves cumplen con las normas regulatorias establecidas en el Tratado de Cielos Abiertos de 1992 que permiten los vuelos de VANT sobre todo el espacio aéreo de sus signatarios. Además, pueden cooperar en misiones de control del narcotráfico y contra el terrorismo. También podrían grabar vídeos de alta calidad para ser empleados como medios de prueba en un juicio internacional.
+Se pueden aplicar en ambientes de alta toxicidad química y radiológicos en desastres tipo Chernóbil, en los que sea necesario tomar muestras con alto peligro de vidas humanas y realizar tareas de control de ambiente. Además, pueden cooperar en misiones de control del narcotráfico y contra el terrorismo. También podrían grabar vídeos de alta calidad para ser empleados como medios de prueba en un juicio internacional.
 
 Los UAV tienen múltiples aplicaciones y posibilidades en el mercado civil y profesional:
 \begin{itemize}
@@ -91,14 +49,20 @@ Los UAV tienen múltiples aplicaciones y posibilidades en el mercado civil y pro
 \caption{Clasificación por aplicación}
 \end{figure}
 
-\section{Tipos}
+\section{Tipos de drones}
 \label{sec:tiposdrones}
 
-La clasificación es muy amplia, pero la primera clasificación podría ser en función del tipo de alas.
+En diciembre de 2013 Amazon sorprendió al mundo demostrando su interés en el envío de paquetes con drones\footnote{\url{https://www.amazon.com/Amazon-Prime-Air/b?node=8037720011}}. Según la propia empresa actualmente se encuentra en la fase de investigación y pruebas con unos VANTs de ocho rotores (optocóptero) que son capaces de levantar cargas de 2.3kg y entregar el paquete en un periodo de 30 minutos desde que el cliente realizase su pedido a través de la web. 
+
+En ese mismo mes, la empresa de envíos DHL mostró su interés en el uso de drones para el reparto de paquetes. Cuentan con unos VANTs con una capacidad de carga de 2.99kg y un radio de acción de 1km. 
+
+No sólo hay interés en el envío de mercancías con estos aparatos, el Ayuntamiento de Madrid, en diciembre de 2013 realizó un simulacro de rescate en el teleférico de Madrid en el que participaron los Bomberos, el Samur y la Policía municipal, en el que se utilizó un VANT de ocho rotores dotado con sensores para detectar gases, temperatura y agentes radioactivos, biológicos y químicos. Equipado con una cámara fue capaz de retransmitir a los puestos de control las imágenes de las victimas involucradas en el rescate.
+
+La clasificación de drones es muy amplia, pero la primera clasificación podría ser en función del tipo de alas.
 
 \begin{itemize}
 \item Drones de Alas Fijas: Tienen alas fijas y son similares a un avión.
-\item Drones MultiRotor: Tipicamente cuadricópteros (4 rotores con hélices) aunque los hay que tienen 6 (hexacópteros) o incluso 8 hélices. Dos hélices giran en el sentido de las agujas del reloj y las otras dos en el otro sentido, creando así la fuerza de empuje necesario para llevar al dron hacia arriba. Se pueden mantener en el mismo sitio sin varias la posición, gracias a sus giroscopios y estabilizadores, lo que es perfecto para sacar fotos y grabar vídeos.
+\item Drones MultiRotor: Tipicamente cuadricópteros (4 rotores con hélices) aunque los hay que tienen 6 (hexacópteros) o incluso 8 hélices. Dos hélices giran en el sentido de las agujas del reloj y las otras dos en el otro sentido, creando así la fuerza de empuje necesaria para llevar al dron hacia arriba. Se pueden mantener en el mismo sitio sin varias la posición, gracias a sus giroscopios y estabilizadores, lo que es perfecto para sacar fotos y grabar vídeos.
 \end{itemize}
 
 \begin{figure}[H]
@@ -116,7 +80,7 @@ Según el método de control tenemos:
 
 \begin{itemize}
 \item Autónomo: El dron no necesita de un piloto humano que lo controle desde tierra. Se guía por sus propios sistemas y sensores integrados. 
-\item Monitorizado: En este caso si se necesita la figura de un técnico humano. La labor de esta persona es proporcionar información y controlar el feedback del dron. El dron dirige su propio plan de vuelo y el técnico, a pesar de no poder controlar los mandos directamente, sí puede decidir que acción llevará a cabo.
+\item Monitorizado: En este caso sí se necesita la figura de un técnico humano. La labor de esta persona es proporcionar información y controlar la realimentación del dron. El dron dirige su propio plan de vuelo y el técnico, a pesar de no poder controlar los mandos directamente, sí puede decidir que acción llevará a cabo.
 \item Supervisado: Un operador pilota el dron, aunque este puede realizar algunas tareas autónomamente.
 \item Pre-programado: El dron sigue un plan de vuelo diseñado previamente y no tiene medios de cambiarlo para adaptarse a posibles cambios.
 \item Controlado remotamente(R/C): El dron es pilotado directamente por un técnico mediante una consola.
@@ -126,7 +90,6 @@ En función de su uso pueden ser:
 
 \begin{itemize}
 \item Drones Militares: son llamados UCAV que procede del inglés Unmanned Combat Air Vehicle, traducido al español sería vehículos no tripulados de combate aéreo. Suelen ir armados y con capacidad de bombardeos.
-\item Monitorizado: En este caso si se necesita la figura de un técnico humano. La labor de esta persona es proporcionar información y controlar el feedback del dron. El dron dirige su propio plan de vuelo y el técnico, a pesar de no poder controlar los mandos directamente, sí puede decidir que acción llevará a cabo.
 \item Drones Civiles: son aquellos drones que no tienen uso militar. A su vez pueden ser de: \begin{itemize}
 \item De uso comercial: como cartografías, fotografías, vídeos, etc.
 \item Para Aficionados: Se utilizan como un juguete y suelen tener precios bastantes económicos.
@@ -134,18 +97,9 @@ En función de su uso pueden ser:
 \end{itemize}
 \end{itemize}
 
-\section{Hardware}
+\section{Hardware de drones}
 
-Hay que destacar los componentes que tiene un dron y su forma, pues es gran parte
-lo que lo hace tan especial, permite que tenga una gran libertad de movimientos, ya
-que puede moverse sin problema desde cualquier punto hacia los ejes X, Y y Z. Lo
-que se gana con esto son funcionalidades como permitirse un aterrizaje y un
-despegue totalmente vertical, sin depender de un espacio en el que coger velocidad
-para levantar el vuelo, e igual con el aterrizaje, pudiendo el dron estando quieto en
-el aire bajar totalmente en vertical hasta posarse sobre el suelo. Una vez en el aire
-puede moverse adelante, atrás, izquierda, derecha, arriba, abajo y combinaciones de
-movimientos entre ejes, además de los giros Roll, Yaw y Pitch y sin necesidad de hacer
-movimientos bruscos.
+Los componentes que tiene un dron y su forma, permiten que tenga una gran libertad de movimientos, ya que puede moverse sin problema desde cualquier punto hacia los ejes X, Y y Z. Por ejemplo, permiten un aterrizaje y un despegue totalmente vertical, sin depender de un espacio en el que coger velocidad para levantar el vuelo, e igual con el aterrizaje, pudiendo el dron estando quieto en el aire bajar totalmente en vertical hasta posarse sobre el suelo. Una vez en el aire puede moverse adelante, atrás, izquierda, derecha, arriba, abajo y combinaciones de movimientos entre ejes, además de los giros Roll, Yaw y Pitch y sin necesidad de hacer movimientos bruscos.
 
 \begin{figure}[H]
   \centering
@@ -156,88 +110,30 @@ movimientos bruscos.
 
 Un desglose explicando cada una de las partes sería:
 \begin{itemize}
-\item Marco: También conocido como estructura o chasis. Es la estructura
-principal sobre la que se sitúan el resto de los elementos. Cambiará su forma
-dependiendo del dron, variando la longitud de las patas o el número de soportes
-para hélices, por ejemplo. Puede estar hecha por diversos materiales, generalmente se
-trata de algún tipo de plástico, ya que es un material que tiene poco coste y pesa poco.
-Un ejemplo es el polipropileno, que es ligero y con mucha resistencia, lo que permite
-colocar sobre él la batería. Otro material que suele utilizarse es la fibra de carbono,
-ya que pesa poco y es muy resistente, aunque puede tener factores negativos como su
-conductividad. Por último, la fibra de vidrio. Es muy utilizado por ser ligero, y tiene características como que no es conductora de la
-electricidad. Es común ver estructuras híbridas entre distintos materiales, sobre todo
-juntando los dos tipos de fibra.
-\item Hélices: Elemento formado por dos palas montadas de forma concéntrica
-sobre un eje, que al girar crean un par de fuerzas, permitiendo así el movimiento del
-dron.
-\item Motores: Son los encargados de transformar la energía que llega en
-movimiento sobre el eje en el que se sitúan las hélices, para así permitirles a éstas
-hacer su trabajo. Tiene distintos parámetros que serán principalmente
-los que permitan al dron llevar mayor velocidad:
+\item Marco: También conocido como estructura o chasis. Es la estructura principal sobre la que se sitúan el resto de los elementos. Cambiará su forma dependiendo del dron, variando la longitud de las patas o el número de soportes para hélices, por ejemplo. Puede estar hecha por diversos materiales, generalmente de algún tipo de plástico, ya que tiene poco coste y pesa poco. Un ejemplo es el polipropileno, que es ligero y con mucha resistencia, lo que permite colocar sobre él la batería. Otro material que suele utilizarse es la fibra de carbono, ya que pesa poco y es muy resistente, aunque puede tener factores negativos como su conductividad. Por último, la fibra de vidrio. Es muy utilizado por ser ligero, y tiene características como que no es conductora de la electricidad. Es común ver estructuras híbridas entre distintos materiales, sobre todo juntando los dos tipos de fibra.
+\item Hélices: Elemento formado por dos palas montadas de forma concéntrica sobre un eje, que al girar crean un par motriz, permitiendo así el movimiento del dron.
+\item Motores: Son los encargados de transformar la energía, típicamente eléctrica en movimiento sobre el eje en el que se sitúan las hélices, para así permitirles a éstas hacer su trabajo. Tiene distintos parámetros que serán principalmente los que permitan al dron llevar mayor velocidad:
 	\begin{itemize}
-	\item El número de vueltas que dé por minuto, lo que dependerá de los Kilovoltios.
-Suele estar en torno a 800-900kV.
-	\item El tamaño que el dron tenga. Al mirar las especificaciones de un dron está en
-un número de 4 dígitos, en el que los dos primeros hacen referencia al tamaño
-del rotor y los otros dos al tamaño de la bobina.
-	\item El empuje, valor que hacer referencia al peso que puede levantar el motor.
+	\item El número de vueltas que dé por minuto, lo que dependerá de los Kilovoltios. Suele estar en torno a 800-900kV.
+	\item El tamaño que el dron tenga. Al mirar las especificaciones de un dron está en un número de 4 dígitos, en el que los dos primeros hacen referencia al tamaño del rotor y los otros dos al tamaño de la bobina. 
+    \item El empuje, valor que hacer referencia al peso que puede levantar el motor.
 	\item La corriente, se trata de la energía (amperios) que se consume cuando el motor
 está al máximo.
 	\end{itemize}
-\item Batería: Encargada de proporcionar la energía suficiente para que el dron
-pueda realizar un vuelo, permitiendo trabajar a la placa controladora y motores. La
-característica principal de las baterías son los miliamperios hora. Cuanto mmayor sea
-permitirá una mayor capacidad y por lo tanto que el dron tenga un mayor tiempo
-de vuelo. Existen baterías de muy diversos tamaños, desde los 350 mah en drones de
-juguete a, por ejemplo, los 4500mah que tiene la batería del dron 3DR Solo. También
-es importante la tasa de descarga, que es la máxima energía que puede entregar y el
-periodo de tiempo durante el que puede hacerlo. Normalmente los drones traen sistemas
-de alerta que avisan cuando a la batería le queda poca energía, o que cuando queda
-un valor menor a cierto porcentaje de carga no permite despegar el dron, evitando así
-que se quede sin energía a mitad de un vuelo.
-\item Equipo de transmisión: Es el encargado de que se comunique el dron con
-una estación receptora. Varía en función del aparato ya que se pueden usar
-diferentes tecnologías, pero principalmente usa radiofrecuencia o Wifi. Existen casos,
-como el modelo 3DR, que combina ambas tecnologías, utilizando la radiofrecuencia
-para la información del movimiento, batería y posicionamiento, y el WiFi para la
-transmisión de imágenes en directo. Se pueden encontrar distintos equipos de sistemas
-de transmisión, uno de los últimos y más destacables es Hyperion, que utiliza un
-sistema óptico de comunicaciones capaz de transmitir hasta 1Gb por segundo, lo que
-permite la transmisión de datos mediante la luz directa. Su principal característica
-es que no pierde información cuando no hay contacto directo entre las dos estaciones.
-La vía WiFi es muy utilizada, pues permite controlar el dron desde una aplicación
-móvil, por lo que conectando estos dos tendríamos un mando que nos permite cambiar
-gran parte de la configuración del dron. También existen dispositivos que permiten
-el control mediante Bluetooth, pero es menos común ya que tiene mayor restricción de
-velocidad de datos y distancia.
+\item Batería: Encargada de proporcionar la energía suficiente para que el dron pueda realizar un vuelo, permitiendo trabajar a la placa controladora y motores. La característica principal de las baterías son los miliamperios hora. Cuanto mayor sea permitirá una mayor capacidad y por lo tanto que el dron tenga un mayor tiempo de vuelo. Existen baterías de muy diversos tamaños, desde los 350 mah en drones de juguete a, por ejemplo, los 4500mah que tiene la batería del dron 3DR Solo. También es importante la tasa de descarga, que es la máxima energía que puede entregar y el periodo de tiempo durante el que puede hacerlo. Normalmente los drones traen sistemas de alerta que avisan cuando a la batería le queda poca energía, o que cuando queda un valor menor a cierto porcentaje de carga no permite despegar el dron, evitando así que se quede sin energía a mitad de un vuelo.
+\item Equipo de transmisión: Es el encargado de que se comunique el dron con una estación receptora. Varía en función del aparato ya que se pueden usar diferentes tecnologías, pero principalmente usa radiofrecuencia o Wifi. Existen casos, como el modelo 3DR, que combina ambas tecnologías, utilizando la radiofrecuencia para la información del movimiento, batería y posicionamiento, y el WiFi para la transmisión de imágenes en directo. Se pueden encontrar distintos equipos de sistemas de transmisión, uno de los últimos y más destacables es Hyperion, que utiliza un sistema óptico de comunicaciones capaz de transmitir hasta 1Gb por segundo, lo que permite la transmisión de datos mediante la luz directa. Su principal característica es que no pierde información cuando no hay contacto directo entre las dos estaciones. La vía WiFi es muy utilizada, pues permite controlar el dron desde una aplicación móvil, por lo que conectando estos dos tendríamos un mando que nos permite cambiar gran parte de la configuración del dron. También existen dispositivos que permiten el control mediante Bluetooth, pero es menos común ya que tiene mayor restricción de velocidad de datos y distancia.
+
 \item Placa controladora: Es el procesador a bordo del dron, el que se encarga de recoger
 la información del dron y cuando le llega una orden ver qué información tiene que
 mandar a los motores para que se ejecute de forma correcta, así como en caso de haber un
 problema tratar de evitarlo. Hay una gama muy amplia:
 	\begin{itemize}
-	\item Pixhawk\footnote{\url{https://pixhawk.org/}}: Es el más utilizado debido a que trabaja con 3DRobotics y Ardupilot.
-Sirve para diversos dispositivos como drones, helicópteros y barcos. Está pensado
-para cualquier vehículo que tenga movimiento. Se trata de un proyecto hardware
-abierto, cuyo objetivo principal es proporcionar el hardware de autopiloto a
-comunidades académicas o gente que tiene esto como un hobby, teniendo así
-un bajo coste y una alta disponibilidad. Es un piloto automático en tiempo real
-y muy eficiente, proporcionando un entorno de estilo POSIX. Es el autopiloto
-estándar de la industria, y por lo tanto, como veremos a continuación, a partir
-él se han desarrollado diversos autopilotos con distintas mejoras.
-	\item Pixhawk2: Es una versión avanzada de la placa anterior. Tiene mejoras
-como aislamiento de vibraciones, 3 IMUs para redundancia (3 acelerómetros,
-3 giróscopos, 3 magnetómetros y 2 barómetros) y sensor para controlar la
-temperatura.
-	\item PixRacer\footnote{\url{https://pixhawk.org/modules/pixracer}}: Se ha desarrollado para los drones de carreras, aunque también se
-utiliza en mini drones. Suele tener una mayor memoria flash.
-	\item Navio2\footnote{\url{https://emlid.com/introducing-navio2/}}: Piloto automático diseñado de Raspberry Pi. Permite convertir ésta
-en un controlador de dron.
-	\item PXFmini\footnote{\url{http://erlerobotics.com/blog/pxfmini/}}: Es otro piloto automático de Raspberry Pi. Tiene la electrónica
-para la mayoría de los componentes que puede utilizar un dron.
-	\item FlytPOD\footnote{\url{http://docs.flytbase.com/docs/FlytPOD/About_FlytPOD.html}}: Es una placa Odroid XU4 SBC junto con una PixHawk. Puede
-volar diversos vehículos aéreos y su principal característica es el WiFi que tiene
-integrado. Existe una placa FlytPOD pro que es una versión extendida de la
-anterior, con más sensores y mayor capacidad de almacenamiento.
+	\item Pixhawk\footnote{\url{https://pixhawk.org/}}: Es el más utilizado debido a que trabaja con 3DRobotics y Ardupilot. Sirve para diversos dispositivos como drones, helicópteros y barcos. Está pensado para cualquier vehículo que tenga movimiento. Se trata de un proyecto hardware abierto, cuyo objetivo principal es proporcionar el hardware de autopiloto a comunidades académicas o de aficionados, teniendo así un bajo coste y una alta disponibilidad. Es un piloto automático en tiempo real y muy eficiente, proporcionando un entorno de estilo POSIX. Es el autopiloto estándar de la industria. Y a partir él se han desarrollado diversos autopilotos con distintas mejoras. 	
+    \item Pixhawk2: Es una versión avanzada de la placa anterior. Tiene mejoras como aislamiento de vibraciones, 3 IMUs para redundancia (3 acelerómetros, 3 giróscopos, 3 magnetómetros y 2 barómetros) y sensor para controlar la temperatura.
+	\item PixRacer\footnote{\url{https://pixhawk.org/modules/pixracer}}: Se ha desarrollado para los drones de carreras, aunque también se utiliza en mini drones. Suele tener una mayor memoria flash.
+	\item Navio2\footnote{\url{https://emlid.com/introducing-navio2/}}: Piloto automático diseñado de Raspberry Pi. Permite convertir ésta en un controlador de dron.
+	\item PXFmini\footnote{\url{http://erlerobotics.com/blog/pxfmini/}}: Es otro piloto automático de Raspberry Pi. Tiene la electrónica para la mayoría de los componentes que puede utilizar un dron. Lo comercializa ERLE-Robotics.
+	\item FlytPOD\footnote{\url{http://docs.flytbase.com/docs/FlytPOD/About_FlytPOD.html}}: Es una placa Odroid XU4 SBC junto con una PixHawk. Puede volar diversos vehículos aéreos y su principal característica es el WiFi que tiene integrado. Existe una placa FlytPOD pro que es una versión extendida de la anterior, con más sensores y mayor capacidad de almacenamiento.
 	\item U-Pilot\footnote{\url{http://www.upilot.ie/}}: Este hardware se caracteriza por servir para diversos vehículos aéreos,
 siendo programable para realizar todas las acciones de su camino de forma
 automática. Su radioenlace con frecuencia en torno a 900Mhz permite controlar
@@ -246,7 +142,17 @@ el dispositivo a una distancia de 100km.
 
 \end{itemize}
 
-Hay que destacar también la cámara a bordo, que aunque no todos los drones la llevan sí es bastante común. Algunos la llevan incorporada (incluso dos cámaras, una que apunta hacia la parte de delante y otra que apunta la parte de abajo) y otras que traen soporte para incorporar ciertas cámaras, normalmente consideradas cámaras de acción, para obtener una mejor calidad. Algunos drones incorporan una Gimbal para controlar la dirección hacia la que queremos que apunte la cámara en cada momento o utilizarlo como estabilizador, para evitar así que afecten a la imagen diversos movimientos, generalmente bruscos, que realice dron. En ocasiones, utilizado normalmente para carreras de drones, la cámara sirve para integrar la tecnología FPV (First Person View), que es junto a la cámara, el transmisor de vídeo y el receptor de vídeo, poder ver en tiempo real las imágenes sobre una pantalla LCD o utilizando unas gafas de realidad virtual. Uno de los sistemas más impactantes es el conjunto que se ha creado con el dron FLYBi, estando éste conectado a unas gafas de realidad virtual que tienen sensor de movimiento, lo que te permite sentir que eres tú el que vuelas y el que estás en el lugar del dron, y con cualquier movimiento que sientan las gafas la cámara del dron lo imitará. En caso de que esto resulte incómodo tiene un joystick con el que también se pueden ordenar los movimientos a la cámara.
+Hay que destacar también la cámara a bordo, que aunque no todos los drones la llevan sí es bastante común. Algunos la llevan incorporada (incluso dos cámaras, una que apunta hacia la parte de delante y otra que apunta la parte de abajo) y otras que traen soporte para incorporar ciertas cámaras, normalmente consideradas cámaras de acción, para obtener una mejor calidad. Algunos drones incorporan una Gimbal para controlar la dirección hacia la que queremos que apunte la cámara en cada momento o utilizarlo como estabilizador, para evitar así que afecten a la imagen diversos movimientos, generalmente bruscos, que realice dron. 
+
+En ocasiones, utilizado normalmente para carreras de drones, la cámara sirve para integrar la tecnología FPV (First Person View), que es junto a la cámara, el transmisor de vídeo y el receptor de vídeo, poder ver en tiempo real y en primera persona, las imágenes sobre una pantalla LCD o utilizando unas gafas de realidad virtual. Uno de los sistemas más impactantes es el conjunto que se ha creado con el dron FLYBi, estando éste conectado a unas gafas de realidad virtual que tienen sensor de movimiento, lo que te permite sentir que eres tú el que vuelas y el que estás en el lugar del dron, y con cualquier movimiento que sientan las gafas la cámara del dron lo imitará. En caso de que esto resulte incómodo tiene un joystick con el que también se pueden ordenar los movimientos a la cámara.
+
+A día de hoy el posicionamiento GPS es un elemento crucial en el control de drones. Integrar sensores GPS con los que conocer en cualquier instante el posicionamiento de nuestro dron, nos facilita ejecutar misiones de vuelo predefinidas o efectuar aterrizajes de improvisados y maniobras de tipo “Go Home” autónomamente y tan solo con un botón del joystick o una acción preprogramada.
+
+Con la ayuda de los sensores GPS podemos conocer la ubicación exacta del dron y comandarle una operación predefinida. Gracias a estos sensores es posible configurar una ruta para operar señalando diferentes waypoints o curvas en el espacio o podemos orientar la videocámara a unas coordenadas concretas. Esto resulta muy útil para la ejecución de operaciones de vigilancia, supervision de construcciones, trabajos topográficos, gestión de agricultura de precisión,
+
+Una IMU (Inertial Measurement Unit), es un dispositivo electrónico que mide e informa acerca de la velocidad, orientación y fuerzas gravitacionales de un aparato, usando una combinación de acelerómetros y giróscopos. Las unidades de medición inercial son normalmente usadas para maniobrar aviones, incluyendo vehículos aéreos no tripulados, entre muchos otros usos, y además naves espaciales, incluyendo transbordadores, satélites y aterrizadores.
+
+La IMU es el componente principal de los sistemas de navegación inercial usados en aviones, naves espaciales, buques y misiles guiados entre otros. En este uso, los datos recolectados por los sensores de una IMU permiten a un computador seguir la posición del aparato, usando un método conocido como navegación por estima.
 
 \begin{figure}[H]
   \centering
@@ -255,40 +161,34 @@ Hay que destacar también la cámara a bordo, que aunque no todos los drones la 
   \label{fig:gnat}
 \end{figure}
 
-\section{Software}
+\section{Software de drones}
 
-El software es el conjunto de programas que permiten realizar ciertas tareas. Algunos programas estarán instalados en la placa controladora y otros fuera del dron, por tanto será el que ejecute para recoger la distinta información de los sensores, procesar la información y enviar las órdenes correctas a los distintos elementos. El desarrollo de software para este tipo de robots ha evolucionado mucho en los últimos años debido al uso civil que se le comienzan a dar y no tanto al desarrollo militar. Existen varios entornos software que permiten el manejo y la programación de estos robots:
+El software es el conjunto de bibliotecas y herramientas que permiten realizar ciertas tareas. Algunos programas estarán instalados en la placa controladora y otros fuera del dron. Será el que se ejecute para recoger la distinta información de los sensores, procesar la información y enviar las órdenes correctas a los distintos elementos. El desarrollo de software para este tipo de robots ha evolucionado mucho en los últimos años debido al uso civil. Existen varios entornos software que permiten el manejo y la programación de estos robots:
 \begin{itemize}
-\item Ardupilot3\footnote{\url{http://ardupilot.org/}}: Es un sistema OpenSource encargado de recibir la información que se le da y de enviar las señales correspondientes a los actuadores. Se trata del software más importante por lo completo que es y la confiabilidad que proporciona, debido a la gran cantidad de gente que lo utiliza (pilotos de drones profesionales y aficionados) y por el equipo de ingenieros que lo han desarrollado. Este software se caracteriza por la variedad de dispositivos que puede controlar, ya que trabaja con diversos dispositivos aéreos (aviones, helicópteros, drones, etc.) y con dispositivos marinos (como los barcos y submarinos). Ha tenido un gran desarrollo debido a que es código abierto. Hay mucha gente creando interfaces para él y dichos usuarios comparten sus avances con el resto. A partir de éste han nacido controladores como Ardupilot Mega. El problema que tiene este software es que sólo permite trabajar con plataformas de los mismos creadores. Otra característica es la facilidad con la que se le pueden añadir diferentes sensores, como los módulos GPS o cámaras, algo que facilita la navegación autónoma.
-\item Megapirate-NG\footnote{\url{https://megapirateng.github.io/Docs/documentation/flashtool}}: Apareció como desarrollo del ArdupilotMega. La funcionalidad de
-uno y otro es prácticamente la misma, con la diferencia de que éste permite
-trabajar con Hardware de otros creadores. El problema es que siempre depende
-de Ardupilot, por lo tanto sus funcionalidades, aunque sean más cómodas para
-trabajar, puede que estén atrasadas.
-\item MultiWii\footnote{\url{http://www.multiwii.com/}}: Se propuso como radiocontrol para drones. Es un sistema que fue
-creado por los desarrolladores y con los sensores (giroscopios y acelerómetros) de
-la Nintendo Wii. Es una plataforma basada en arduino, con el factor en contra
-de tener una funcionalidad bastante limitada.
+\item Ardupilot3\footnote{\url{http://ardupilot.org/}}: Es un sistema de código abierto (o software libre) encargado de recibir la información que se quiere trasmitir al drone, recoger la información de los sensores o enviar las señales correspondientes a los motores. Se trata del software más importante por lo completo que es y la confiabilidad que proporciona, debido a la gran cantidad de gente que lo utiliza (pilotos de drones profesionales y aficionados) y por el equipo de ingenieros que lo han desarrollado. Este software se caracteriza por la variedad de dispositivos que puede controlar, ya que trabaja con diversos dispositivos aéreos (aviones, helicópteros, drones, etc.) y con dispositivos marinos (como los barcos y submarinos). Otra característica es la facilidad con la que se le pueden añadir diferentes sensores, como los módulos GPS o cámaras, algo que facilita la navegación autónoma. Ha tenido un gran desarrollo debido a que es código abierto. Hay mucha gente creando interfaces para él y dichos usuarios comparten sus avances con el resto. A partir de éste han nacido controladores como Ardupilot Mega. El problema que tiene este software es que sólo permite trabajar con plataformas de los mismos creadores. 
+\item Megapirate-NG\footnote{\url{https://megapirateng.github.io/Docs/documentation/flashtool}}:  pareció como desarrollo del ArdupilotMega. La funcionalidad de uno y otro es prácticamente la misma, con la diferencia de que éste permite trabajar con Hardware de otros creadores. El problema es que siempre depende de Ardupilot, por lo tanto sus funcionalidades, aunque sean más cómodas para trabajar, puede que estén atrasadas.
+\item MultiWii\footnote{\url{http://www.multiwii.com/}}: Se propuso como radiocontrol para drones. Es un sistema que fue creado por los desarrolladores y con los sensores (giroscopios y acelerómetros) de la Nintendo Wii. Es una plataforma basada en arduino, con el factor en contra de tener una funcionalidad bastante limitada.
 
 \end{itemize}
 
-Estos son los entornos software principales que estarían sobre el vehículo, pero también están los programas que se ejecutarían en otros dispositivos como el ordenador o el teléfono móvil para ver la información que nos envía. Normalmente el fabricante del dron tiene ya un programa que realiza esta función. En este punto es importante el protocolo de comunicación que habrá para comunicar el vehículo con la estación terrena. Aquí hay un protocolo que destaca sobre los demás, el MAVLink\footnote{\url{mavlink.org}} (Micro Air Vehicle Communication Protocol). Este protocolo tiene la información contenida en ficheros .xml, lo que permite utilizarlo en diversos lenguajes de comunicación, y conlleva una mejora notable en su desarrollo. Al tener el fichero .xml los tipos de mensaje, permite con facilidad añadir nuevos tipos para asignar una tarea nueva. Otra ventaja es que hay muchos software de drones que lo soportan, como pueden ser Ardupilot, Autopilot, algunos derivados de éstos y otros como Gentlenav o Flexipilot, y desde la estación tierra algunos como MAVProxy, Mission Planer o APM planner. 
+Estos son los entornos software principales que estarían sobre el vehículo, pero también están los programas que se ejecutarían en otros dispositivos como el ordenador o el teléfono móvil para ver la información que nos envía desde la estación de tierra (Ground Control Station) en términos generales. Normalmente el fabricante del dron tiene ya un programa que realiza esta función. En este punto es importante el protocolo de comunicación que se usa para comunicar el vehículo con la estación terrena. Aquí hay un protocolo que destaca sobre los demás, el MAVLink\footnote{\url{mavlink.org}} (Micro Air Vehicle Communication Protocol). Este protocolo tiene la información contenida en ficheros .xml, lo que permite utilizarlo en diversos lenguajes de comunicación. Además al tener el fichero .xml los tipos de mensajes, permite con facilidad añadir nuevos tipos para asignar una tarea nueva. Otra ventaja es que hay mucho software de drones que lo soportan, como pueden ser Ardupilot, Autopilot, algunos derivados de éstos y otros como Gentlenav o Flexipilot, y desde la estación tierra algunos como MAVProxy, Mission Planer o APM planner. 
 
-Un problema en este protocolo es que los datos no están encriptados en la comunicación, por lo que es más fácil un ataque y que se manipulen los datos. Además, detecta si se pierde algún dato ya que utiliza CRC (código de redundancia cíclica para detectar cambios en los datos, este se utiliza en protocolos como TCP). MAVLink utiliza otro software llamado MAVProxy para acceder a los datos del vehículo, como la velocidad y las imágenes, lo que permite también saber qué datos mandarle para que funcione de forma correcta. 
+Una desventaja de este protocolo es que los datos no están encriptados en la comunicación, por lo que es más fácil un ataque y que se manipulen los datos. Además, detecta si se pierde algún dato ya que utiliza CRC (código de redundancia cíclica para detectar cambios en los datos). MAVLink se utiliza desde otro software llamado MAVProxy para acceder a los datos del vehículo, como la velocidad y las imágenes, lo que permite también saber qué datos mandarle para que funcione de forma correcta. 
 
-Destacar también el entorno software ROS (Robot Operating System), meta sistema operativo de código abierto mantenido por la Open Source Robotics Fundation(OSRF). ROS tiene librerías y herramientas que permiten desarrollar software para robots. Es el software para robots más extendido en el mundo, lo que conlleva que sea el que más aplicaciones tiene para la robótica. También ofrece muchos componentes para el manejo de drones. En mayo de 2010 mostró el primer vídeo en el que un dron conseguía volar utilizando ROS. En esta demostración el dron se movía con trayectorias agresivas, para mostrar su correcto funcionamiento. Desde entonces ha seguido sacando herramientas para ver el estado del dron conectando con los sensores, imágenes de las cámaras o GPS. PIXHAWK también integró su sistema con ROS, lo que hizo que éste todavía creciera más. También tiene interfaz para el control del ArDrone. Por otro lado, en protocolos de comunicación MAVLink lanzó también un software para la compatibilidad con ROS. 
+Destacar también el entorno software ROS (Robot Operating System), meta sistema operativo de código abierto mantenido por la Open Source Robotics Fundation (OSRF). ROS tiene librerías y herramientas que facilitan desarrollar software para robots. Es el entorno para robots más extendido en el mundo, lo que conlleva que sea el que más aplicaciones tiene. También ofrece muchos componentes para el manejo de drones. En mayo de 2010 mostró el primer vídeo en el que un dron conseguía volar utilizando ROS. En esta demostración el dron se movía con trayectorias agresivas, para mostrar su correcto funcionamiento. Desde entonces ha seguido sacando herramientas para ver el estado del dron conectando con los sensores, imágenes de las cámaras o GPS. Pixhawk también integró su sistema con ROS, lo que hizo que éste todavía creciera más. También tiene interfaz para el control del ArDrone de Parrot. Por otro lado, en protocolos de comunicación MAVLink lanzó también un software para la compatibilidad con ROS. 
 
-A parte de todos éstos, existen también otras infraestructuras software como
-JdeRobot, que es la que hemos usado en este trabajo y que se describirá con más detalle en el capítulo 3.
+A parte de éstos, existen también otros entornos software como JdeRobot, que es la que hemos usado en este trabajo y que se describirá con más detalle en el capítulo 3.
 
 \section{Normativa sobre Drones}
 \label{sec:normativa}
 
-Debido a la gran rapidez con la que se está desarrollando la industria de los drones en España, a día de hoy existe una legislación\cite{normativa} de drones y unas normas, pero que todavía tienen muchas lagunas. La mayoría de las personas cuando compran un dron, desconocen qué pueden hacer con él, dónde lo pueden volar, y en qué momento pueden llegar a violar la Ley de Drones España que hoy en día está vigente.
+Las aeronaves cumples con las normas regualtorias establecidad en el Tratado de cielos Abiertos de 1992 que permiquen los vuelos de VANT sobre todo el espacio aéreo de sus signatarios.
+
+Debido a la gran rapidez con la que se está desarrollando la industria de los drones en España, a día de hoy existe una legislación\cite{normativa} de drones y unas normas, pero que todavía tienen muchas lagunas. La mayoría de las personas cuando compran un dron desconocen qué pueden hacer con él, dónde lo pueden volar, y en qué momento pueden llegar a violar la Ley de Drones que hoy en día está vigente.
 
 Para las normativas y legislación sobre drones en países diferentes a España, cada uno debe mirar la Ley que se esté aplicando en cada lugar en este momento, ya que como hemos comentado, esta industria no ha hecho más que empezar, y está en constante evolución y mejora.
 
-\subsection{Normas básicas}
+Las normas básicas principales son:
 
 \begin{itemize}
 \item Nunca se debe perder el dron de vista, es decir, no puede estar a una distancia que no sea posible ver, ni detrás de obstáculos.
@@ -301,11 +201,11 @@ Para las normativas y legislación sobre drones en países diferentes a España,
 \begin{figure}[H]
   \centering
   \includegraphics[scale=0.3]{imagenes/normas.jpg}
-  \caption{Normas}
+  \caption{Normas principales}
   \label{fig:normas}
 \end{figure}
 
-\subsection{Prohibiciones}
+Las prohibiciones más importantes son:
 
 \begin{itemize}
 \item Está prohibido volar en zonas urbanas.
@@ -314,32 +214,27 @@ Para las normativas y legislación sobre drones en países diferentes a España,
 \item Está prohibido volar cerca de aeropuertos o aeródromos.
 \item Esta prohibido volar drones en España donde otras aeronaves realicen vuelos a poca altura. Esto incluye zonas de parapente, aeródromos, helipuertos, zonas de paracaidismo, etc.
 \item Como regla general, no se debe poner en peligro a terceros. Es decir, siempre que se vuele un dron, se debe estar muy atento de dónde se está volando, y de si hay personas cerca.
-\item La Ley de drones España es muy clara respecto a este punto, e incluso prevé multas que pueden alcanzar los 225.000€. Aunque esto intimida mucho, con usar el sentido común. Y tener presente el que no haya personas cerca. Es más que suficiente para disfrutar de nuestros drones sin tener ningún problema.
 \end{itemize}
 
-Lo que se debe tener claro es que a efectos legales, usar un dron como diversión, como hobby, está perfectamente permitido. Lo que está sujeto a restricciones  es usar dicho dron para fines comerciales.
+La Ley de drones España es muy clara respecto a estos puntos \ref{fig:prohibiciones}, e incluso prevé multas que pueden alcanzar los 225.000€. Aunque esto intimida mucho, con usar el sentido común, y tener presente que no haya personas cerca, es más que suficiente para disfrutar de nuestros drones sin tener ningún problema.
 
-Es decir, se puede volar con nuestro dron sin ningún problema, respectando los puntos señalados anteriormente, a menos que, por ejemplo,  se realice una grabación y se esta sea vendida. En ese momento el uso pasa a ser comercial.
+A efectos legales, usar un dron como diversión, como hobby, está perfectamente permitido. Lo que está sujeto a restricciones  es usar dicho dron para fines comerciales. Es decir, se puede volar con nuestro dron sin ningún problema, respetando los puntos señalados anteriormente, a menos que, por ejemplo,  se realice una grabación y se ésta sea vendida. En ese momento el uso pasa a ser comercial.
 
-Para volar drones con fines comerciales o profesionales, a día de hoy, es necesario tener licencia de piloto o acudir a un centro acreditado y sacar una licencia.
-
-Es decir, si se quiere usar un dron para tareas como riego, fumigación, fotografía aérea, detección de incendios forestales, inspección de líneas de alta tensión,  fotogrametría, etc. es obligatorio acudir a un centro reconocido y obtener el certificado básico o avanzado que acredite que se pueden desempeñar estas tareas. Además, es obligatorio tener los 18 años y presentar un certificado médico. Con esto, será posible pilotar drones de hasta 25kg con fines comerciales o profesionales.
+Para volar drones con fines comerciales o profesionales, a día de hoy, es necesario tener licencia de piloto o acudir a un centro acreditado y sacar una licencia. Es decir, si se quiere usar un dron para tareas como riego, fumigación, fotografía aérea, detección de incendios forestales, inspección de líneas de alta tensión,  fotogrametría, etc. es obligatorio acudir a un centro reconocido y obtener el certificado básico o avanzado que acredite que se pueden desempeñar estas tareas. Además, es obligatorio tener los 18 años y presentar un certificado médico. Con esto, será posible pilotar drones de hasta 25kg con fines comerciales o profesionales.
 
 \begin{figure}[H]
   \centering
   \includegraphics[scale=0.3]{imagenes/prohibiciones.jpg}
-  \caption{Prohibiciones}
+  \caption{Prohibiciones principales}
   \label{fig:prohibiciones}
 \end{figure}
 
 
-\section{Robótica aérea en RoboticsLab de la URJC}
-En un contexto más cercano, este proyecto se inició tras otros realizados
-anteriormente en el laboratorio de robótica de la universidad. Los ejemplos más
-destacables son los siguientes:
+\section{Robótica aérea en el proyecto abierto JdeRobot}
+En un contexto más cercano, este proyecto se inició tras otros realizados anteriormente en el proyecto JdeRobot de software libre para robótica. Los ejemplos más destacables son los siguientes:
 \begin{itemize}
 \item Alberto Martín\cite{albertoMartin} \footnote{\url{http://jderobot.org/Amartinflorido-tfg}} trabajó en el seguimiento de objetos con un dron
-utilizando su cámara. Tenía un controlador reactivo PID, y el dron tenía que seguir una pelota de color rosa, consiguiendo que le siguiera en un espacio 3D. El dron en caso de no encontrar la pelota rosa se quedaba parado donde estuviera. Adicionalmente en este proyecto se desarrolló el driver para el ArDrone del Parrot real.
+utilizando su cámara \ref{fig:albertoMartin}. Tenía un controlador reactivo PID, y el dron tenía que seguir una pelota de color rosa, consiguiendo que le siguiera en un espacio 3D. El dron en caso de no encontrar la pelota rosa se quedaba parado donde estuviera. Adicionalmente en este proyecto se desarrolló el driver para el drone real ArDrone de Parrot.
 
 \begin{figure}[H]
   \centering
@@ -349,7 +244,7 @@ utilizando su cámara. Tenía un controlador reactivo PID, y el dron tenía que 
 \end{figure}
 
 
-\item Arturo Vélez\cite{arturoVelez} \footnote{\url{http://jderobot.org/Avelez-tfg}} trabajó en un seguimiento visual de objetos sin filtro de color, en el cual un dron debe seguir una textura que se mueve por el suelo detectando los puntos de interés. En caso de que el dron pierda la referencia de la figura en la imagen, realiza una búsqueda.
+\item Arturo Vélez\cite{arturoVelez} \footnote{\url{http://jderobot.org/Avelez-tfg}} trabajó en un seguimiento visual de objetos sin filtro de color, en el cual un dron debe seguir una textura que se movía por el suelo detectando los puntos de interés \ref{fig:arturoVelez}. En caso de que el dron pierda la referencia de la figura en la imagen, realiza una búsqueda.
 
 \begin{figure}[H]
   \centering
@@ -359,7 +254,7 @@ utilizando su cámara. Tenía un controlador reactivo PID, y el dron tenía que 
 \end{figure}
 
 
-\item Manuel Zafra\cite{manuelZafra} \footnote{\url{http://jderobot.org/Mazafrav-pfc}} trabajó en la localización del dron mediante April Tags y seguimiento de trayectorias. El objetivo de éste era recorrer autónomamente una ruta tridimensional en interiores, como secuencia de puntos 3D para lo que necesitaba estar localizado. Gracias a las April Tags que detectaba el dron podía estimar la posición 3D en el que estaba situado.
+\item Manuel Zafra\cite{manuelZafra} \footnote{\url{http://jderobot.org/Mazafrav-pfc}} trabajó en la localización del dron mediante April Tags y seguimiento de trayectorias en 3D \ref{fig:manuelZafra}. El objetivo de éste era recorrer autónomamente una ruta tridimensional en interiores como secuencia de puntos 3D, para lo que necesitaba estar localizado. Gracias a las balizas April Tags que detectaba el dron podía estimar la posición 3D en el que estaba situado.
 
 \begin{figure}[H]
   \centering
@@ -369,13 +264,7 @@ utilizando su cámara. Tenía un controlador reactivo PID, y el dron tenía que 
 \end{figure}
 
 
-\item Daniel Yagüe\cite{danielYague} \footnote{\url{http://jderobot.org/Daniyague-pfc}} trabajó con el ArDrone sobre Gazebo, probando distintas
-funcionalidades y escenarios. Por un lado trabajó en el driver para el cuadricóptero
-simulado, consiguiendo un plugin para el ArDrone que proporciona los datos de los
-sensores a bordo y que acepta y ejecuta ordenes como despegar, aterrizar y los distintos
-movimientos de vuelo. Por otro lado sobre simulador programó varias aplicaciones de control
-visual, haciendo que el dron siguiera una línea, una carretera o que un dron siguiera
-al otro.
+\item Daniel Yagüe\cite{danielYague} \footnote{\url{http://jderobot.org/Daniyague-pfc}} trabajó con el ArDrone sobre Gazebo, probando distintas funcionalidades y escenarios \ref{fig:daniYague}. Por un lado trabajó en el driver para el cuadricóptero simulado, consiguiendo un plugin del simulador Gazebo para el ArDrone que proporciona los datos de los sensores a bordo y que acepta y ejecuta ordenes como despegar, aterrizar y los distintos movimientos de vuelo. Por otro lado sobre simulador programó varias aplicaciones de control visual, haciendo que el dron siguiera una línea, una carretera o que un dron siguiera al otro.
 
 \begin{figure}[H]
   \centering
@@ -384,7 +273,7 @@ al otro.
   \label{fig:daniYague}
 \end{figure}
 
-\item Jorge Cano\cite{jorgeCano} \footnote{\url{http://jderobot.org/J.canoma-tfg}}trabajó en el diseño, construcción y programación de un dron real. El driver que realizó para su control se basa en el protocolo MAVLink. Por una parte trabajó en el diseño y construcción de la plataforma hardware, como se muestra en la figura \ref{fig:jorgeCano}, y por otra en el controlador software para la comunicación con el vehículo. Para hacer tests de vuelo realizó pruebas perceptivas y de control, con filtros de colores y un controlador PID.
+\item Jorge Cano\cite{jorgeCano} \footnote{\url{http://jderobot.org/J.canoma-tfg}}trabajó en el diseño, construcción y programación de un dron real desde cero. El driver que realizó para su control se basa en el protocolo MAVLink. Por una parte trabajó en el diseño y construcción de la plataforma hardware, como se muestra en la figura \ref{fig:jorgeCano}, y por otra en el controlador software para la comunicación con el vehículo. Para hacer tests de vuelo realizó pruebas perceptivas y de control, con filtros de colores y un controlador PID.
 
 \begin{figure}[H]
   \centering
@@ -393,7 +282,7 @@ al otro.
   \label{fig:jorgeCano}
 \end{figure}
 
-\item Jorge Vela\cite{jorgeVela} \footnote{\url{http://jderobot.org/Jvela-tfg}} trabajó en el diseño de un algoritmo con la finalidad de que el dron navegue de forma autónoma, desde una baliza de despegue hasta otra baliza de aterrizaje, de posición desconocida, y no necesite a ninguna persona diciéndole lo que tiene que hacer en cada momento o controlándole. Para conseguirlo se han tenido en cuenta los distintos estados en los que se puede encontrar el dron.
+\item Jorge Vela\cite{jorgeVela} \footnote{\url{http://jderobot.org/Jvela-tfg}} trabajó en el diseño de un algoritmo para que el dron navegue de forma autónoma \ref{fig:jorgeVela}, desde una baliza de despegue hasta otra baliza de aterrizaje, de posición desconocida, y no necesite a ninguna persona diciéndole lo que tiene que hacer en cada momento o controlándole. Para conseguirlo se han tenido en cuenta los distintos estados en los que se puede encontrar el dron.
 
 \begin{figure}[H]
   \centering
@@ -404,4 +293,4 @@ al otro.
 
 \end{itemize}
 
-Una vez terminada la breve introducción, el resto de esta memoria se organiza en otros cinco capítulos. En el capítulo 2 se redactan los objetivos propuestos y la metodología seguida para llegar hasta ellos. En el capítulo 3 se presenta la infraestructura utilizada y cómo se ha trabajado con ella. En el capítulo 4 se describe el \textit{driver} que se ha implementado, cómo se ha programado y porqué se han seguido unos u otros caminos. En el capítulo 5 se detalla la herramienta de apoyo desarrollado para dirigir el dron y los resultados que se han obtenido. Por último, en el capítulo 6 se incluyen las conclusiones a las que se han llegado tras finalizar este proyecto.
+Una vez terminada esta breve introducción, el resto de esta memoria se organiza en otros cinco capítulos. En el capítulo 2 se redactan los objetivos propuestos y la metodología seguida para llegar hasta ellos. En el capítulo 3 se presenta la infraestructura utilizada y cómo se ha trabajado con ella. En el capítulo 4 se describe el \textit{driver} que se ha implementado, cómo se ha programado y porqué se han seguido unos u otros caminos. En el capítulo 5 se detalla la herramienta de apoyo desarrollado para teleoperar el dron y los resultados que se han obtenido. Por último, en el capítulo 6 se incluyen las conclusiones a las que se han llegado tras finalizar este proyecto.
