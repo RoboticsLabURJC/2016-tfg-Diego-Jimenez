@@ -12,7 +12,7 @@ La comunicación de nuestro driver con el dron es bidireccional. Dependiendo del
 \section{Diseño}
 \label{Diseno}
 
-MAVLinkServer es un driver basado en el software MAVProxy y desarrollado para actuar como un \textit{middleware} de traducción. Ha sido diseñado como un controlador JdeRobot en lenguaje Python. Es responsable de mantener, los canales de comunicación abiertos y actualizados, tanto en sentido ascendente como descendente. 
+MAVLinkServer es un driver basado en el software MAVProxy y desarrollado para actuar como un \textit{middleware} de traducción. Ha sido diseñado como un controlador JdeRobot en lenguaje Python. Es responsable de mantener los canales de comunicación abiertos y actualizados, tanto en sentido ascendente como descendente. 
 
 En la imagen \ref{fig:diagramaHwSw} se indica cómo es la relación entre el hardware y el software de cada componente, así como la comunicación interna o la comunicación hacia otros elementos.
 
@@ -23,20 +23,20 @@ En la imagen \ref{fig:diagramaHwSw} se indica cómo es la relación entre el har
   \label{fig:diagramaHwSw}
 \end{figure}
 
-El driver se ha diseñado combinando tres bloques como se indica en la figura \ref{fig:memoriaCompartida}: el de configuración; el de diálogo con el drone, usando MAVProxy; y el de diálogo con la aplicación usando interfaces ICE.
+El driver se ha diseñado combinando tres bloques como se indica en la figura \ref{fig:memoriaCompartida}: el de configuración; el de diálogo con el drone usando MAVProxy; y el de diálogo con la aplicación usando interfaces ICE.
 
 \begin{figure}[H]
   \centering
-  \includegraphics[scale=0.16]{imagenes/MEMORIACOMPARTIDA.png}
+  \includegraphics[scale=0.25]{imagenes/MEMORIACOMPARTIDA.png}
   \caption{Diagrama de bloques en MAVLinkServer}
   \label{fig:memoriaCompartida}
 \end{figure}
 
-El primer bloque, es el que realiza la configuración necesaria para preparar todas las conexiones de los dos bloques siguientes. Toda la configuración se realiza a través de un único fichero para las interfaces ICE, ya que los módulos que se quieran añadir adicionalmente, se deben introducir mediante argumentos en la ejecución del script de arranque.
+El primer bloque es el que realiza la configuración necesaria para preparar todas las conexiones de los dos bloques siguientes. Toda la configuración se realiza a través de un único fichero para las interfaces ICE, ya que los módulos que se quieran añadir adicionalmente, se deben introducir mediante argumentos en la ejecución del script de arranque.
 
 En el segundo bloque, MAVLinkServer establece la conexión con el piloto automático Pixhawk a bordo del drone, mantiene el canal de comunicación operativo, adquiere, interpreta, crea y envía mensajes nuevos con la información solicitada u ordenada por la aplicación.
 
-El tercer bloque, el código desarrollado está principalmente a cargo de la gestión de las interfaces ICE de JdeRobot. Es capaz de manejar la información proporcionada por el lado de MAVProxy. Regula la creación y modificación de las clases donde la información se almacena temporalmente y abre canales de comunicación ICE para hacer que el driver sea utilizable para aplicaciones JdeRobot.
+El código desarrollado en tercer bloque, está principalmente a cargo de la gestión de las interfaces ICE de JdeRobot. Es capaz de manejar la información proporcionada por el lado de MAVProxy. Regula la creación y modificación de las clases donde la información se almacena temporalmente y abre canales de comunicación ICE para hacer que el driver sea utilizable para aplicaciones JdeRobot.
 
 Estos tres bloques en conjunto proporcionan un driver fiable y multi-compatible; MAVLinkServer puede conectarse con aplicaciones escritas en otros lenguajes, como C++, Python o Java, a través de las interfaces ICE de JdeRobot. La figura \ref{fig:mavLinkJdeRobotNegra} representa un esquema de entradas y salidas dentro de MAVLinkServer y sus conexiones a otras aplicaciones.
 
@@ -53,7 +53,7 @@ La información que se maneja dentro del driver se gestiona a través de memoria
 \begin{figure}[H]
   \centering 
   \hspace*{-2.5cm}     
-  \includegraphics[scale=0.55]{imagenes/cajaTransparente.png}
+  \includegraphics[scale=0.45]{imagenes/cajaTransparente.png}
   \caption{Diagrama bloques MAVLink-JdeRobot con detalle}
   \label{fig:mavLinkJdeRobotTrasparente}
 \end{figure}
@@ -69,21 +69,19 @@ Las interfaces JdeRobot utilizadas en este proyecto se muestran en la figura \re
 
 
 \section{Diálogo con drone vía MavProxy}
-En este apartado vamos a explicar todos los pasos a seguir para realizar una configuración correcta del driver vía MAVProxy. Por ejemplo, antes de que el driver pueda ejecutar correctamente hay que configurar el software MAVProxy del sistema.
+Antes de que el driver pueda ejecutar correctamente hay que configurar el software MAVProxy del sistema. En este apartado vamos a explicar todos los pasos a seguir.
 
 \subsection{Configuración}
 \label{Pre-Configuracion}
-Para llevar a cabo esta configuración de MAVProxy debemos tener en cuenta la existencia de una serie de ficheros, llamados módulos, que cada uno de ellos va a facilitar una utilidad diferente, pueden ir desde conocer la batería, altura del dron o configurar una web-cam.
+Para configurar MAVProxy debemos tener en cuenta de una serie de ficheros, llamados módulos,  cada uno de los cuales facilita una utilidad diferente. Pueden ir desde conocer la batería, la altura del dron o configurar una web-cam.
 
-Estos módulos se pueden descargar desde el repositorio oficial de MAVProxy\footnote{\url{https://github.com/ArduPilot/MAVProxy}} o crear una librería propia e implementarla.
-
-Los módulos que se han usado para la comunicación via MAVProxy son: 
+Estos módulos se pueden descargar desde el repositorio oficial de MAVProxy\footnote{\url{https://github.com/ArduPilot/MAVProxy}} o crear una librería propia e implementarla. Los módulos que se han usado en este TFG para la comunicación via MAVProxy son: 
 
 \begin{itemize}
 \item mavproxy\_link: Realiza la interconexión entre dron y MAVLinkServer.
 \item mavproxy\_arm: Necesario para el despegue.
 \item mavproxy\_cmdlong: Envía los comandos de velocidad al dron y órdenes de despegue y aterrizaje.
-\item mavproxy\_console: Interprete de comandos desde la consola de texto.
+\item mavproxy\_console: Intérprete de comandos desde la consola de texto.
 \item mavproxy\_sensors: Recoge información de los sensores.
 \end{itemize}
 
@@ -93,22 +91,6 @@ El script de arranque se encarga de ejecutar todos los comandos preparatorios pa
 Se necesita tener preinstalado tanto \texttt{pyserial} como una versión de \texttt{pyvmavlink} superior a la 1.1.50. Se realiza una descarga de todos los módulos, construye un directorio llamado MavProxy.egg en /home/USER/.local/python2.7/site-packages con el fin de tener almacenados todos los paquetes necesarios y con permisos suficientes. 
 
 La configuración que se puede modificar en el script de arranque está relacionada con el tipo de conexión que se quiere mantener con el dron. Esta conexión tiene valores por defecto pero se puede modificar si así se desea. Los comandos que se muestran en la tabla 4.1 son un ejemplo de la versatilidad que tiene el servidor. A través de los módulos descargados es posible acceder a los comandos que proporciona MAVLink. A continuación se proporciona un listado de los posibles comandos opcionales que se pueden añadir al script de arranque y una breve explicación de cada uno de ellos en la tabla 4.1:
-\begin{center}
-  \label{tab:scriptArranqueComandos2}
-  \begin{tabular}{ | l | p{7cm} | p{3.5cm} |}
-  \hline
-    \textbf{Comando} & \textbf{Acción} & \textbf{Valor por defecto} \\ \hline
-    nowait&No realiza comunicación continua con el dron (HearthBeat) &  False\\ \hline
-    dialect & Dialecto MAVLink& ardupilotmega \\ \hline
-    rtscts& Habilita control de comunicación vía RTS/CTS&  False\\ \hline
-    mission& Nombre de la misión& None \\ \hline
-    daemon & Arranca en modo daemon, no muestra shell interactiva & False \\ \hline
-    profile& Arranca el Yappi python profiler& False \\ \hline
-    state-basedir& Directorio base para logs& None \\ \hline
-    version& Muestra información sobre la versión& False \\ \hline
-    default-modules& Módulos por defecto al iniciar.& log, wp, rally, fence, param, relay, tuneopt, arm, mode, calibration, rc, auxopt, misc, cmdlong, battery, terrain, output \\ \hline
-  \end{tabular}
-\end{center}
 
 \begin{center}
   \label{tab:scriptArranqueComandos}
@@ -144,11 +126,24 @@ La configuración que se puede modificar en el script de arranque está relacion
   \end{tabular}
   \captionof{table}{Tabla de comandos de arranque}
 \end{center}
+\begin{center}
+  \label{tab:scriptArranqueComandos2}
+  \begin{tabular}{ | l | p{7cm} | p{3.5cm} |}
+  \hline
+    \textbf{Comando} & \textbf{Acción} & \textbf{Valor por defecto} \\ \hline
+    nowait&No realiza comunicación continua con el dron (HearthBeat) &  False\\ \hline
+    dialect & Dialecto MAVLink& ardupilotmega \\ \hline
+    rtscts& Habilita control de comunicación vía RTS/CTS&  False\\ \hline
+    mission& Nombre de la misión& None \\ \hline
+    daemon & Arranca en modo daemon, no muestra shell interactiva & False \\ \hline
+    profile& Arranca el Yappi python profiler& False \\ \hline
+    state-basedir& Directorio base para logs& None \\ \hline
+    version& Muestra información sobre la versión& False \\ \hline
+    default-modules& Módulos por defecto al iniciar.& log, wp, rally, fence, param, relay, tuneopt, arm, mode, calibration, rc, auxopt, misc, cmdlong, battery, terrain, output \\ \hline
+  \end{tabular}
+\end{center}
 
-\bigskip
-\bigskip
-\bigskip
-Todos los módulos se cargan mediante una importación de paquetes. La lista que se carga mediante este procedimiento se divide en los módulos que se cargan por defecto, como pueden ser el que \texttt{link} o \texttt{sensors} y otros opcionales que se pueden seleccionar desde la configuración, como por ejemplo \texttt{console}. A continuación se muestra la función que permite esta carga:
+Todos los módulos se cargan mediante una importación de paquetes. La lista que se carga mediante este procedimiento se divide en los módulos que se cargan por defecto, como pueden ser el que \texttt{link} o \texttt{sensors}, y otros opcionales que se pueden seleccionar desde la configuración, como por ejemplo \texttt{console}. A continuación se muestra la función que permite esta carga:
 \begin{lstlisting}[frame=single]
 
 def load_module(modname, quiet=False):
@@ -188,7 +183,7 @@ def load_module(modname, quiet=False):
 
 Para llevar a cabo esta preparación el primer módulo que se carga es "Link", este paquete se encarga de la conexión entre el servidor y el dron. Es necesario conocer la dirección IP que levanta este dron, que ya habremos configurado en el paso \ref{Pre-Configuracion}.
 
-Tras lograr la conexión se establece un periodo de "checkeo" necesario para no perder la conexión con el dron en caso de llegar a una distancia límite o un fallo de conexión, en cuyo caso se procede a detenerse el dron. Esto se debe a periódicamente se debe realizar una comunicación entre el dron y el servidor, aunque no se llegue a mandar ningún comando, ya sea de velocidad o algún tipo de acción, el servidor por su parte comunicará que aún está conectado. Después de un tiempo sin conexión, aproximadamente unos 10-15 segundos, el dron procederá a realizar un aterrizaje. 
+Tras lograr la conexión se establece un periodo de "checkeo" necesario para no perder la conexión con el dron en caso de llegar a una distancia límite o un fallo de conexión, en cuyo caso se procede a detener el dron. Periódicamente se debe realizar una comunicación entre el dron y el servidor, aunque no se llegue a mandar ningún comando, ya sea de velocidad o algún tipo de acción. El servidor por su parte comunicará que aún está conectado. Después de un tiempo sin conexión, aproximadamente unos 10-15 segundos, el dron procederá a realizar un aterrizaje. 
 
 \begin{lstlisting}[frame=single]
 def periodic_tasks():
@@ -227,11 +222,40 @@ def periodic_tasks():
             unload_module(m.name)
 \end{lstlisting}
 
+En el lado de comunicación con el cuadricóptero, el driver sólo tiene una conexión con el dron a través de una IP y un puerto que se especifican en el arranque. Este bloque de MAVLinkServer está programado con tres hilos separados, uno para cada información relevante a intercambiar con el dron: posición, comandos de velocidad y comandos extra. La gestión de estos 3 hilos, respecto al único puerto abierto con el dron dron, se basa en prioridades. El hilo de comandos Extra predomina sobre los otros 2 debido a la importancia de las órdenes que envía. El segundo hilo prioritario es el que envía los comandos de velocidad. El hilo menos prioritario es el de recepción de actualizaciones de posición. 
+
+\begin{lstlisting}[frame=single]
+    mpstate.status.thread = threading.Thread(target=main_loop, 
+    						name='main_loop')
+    mpstate.status.thread.daemon = True
+    mpstate.status.thread.start()
+
+    # Open an MAVLink TX communication and 
+    # leave it open in a parallel thread
+  
+    PoseTheading = threading.Thread(target=sendCMDVel2Vehicle, 
+    				args=(PH_CMDVel,PH_Pose3D,), 
+                    name='TxCMDVel_Theading')
+    PoseTheading.daemon = True
+    PoseTheading.start()
+
+    # Open an MAVLink TX communication and 
+    # leave it open in a parallel thread
+
+    PoseTheading = threading.Thread(target=landDecision, 
+    				args=(PH_Extra,), 
+                    name='LandDecision2Vehicle_Theading')
+    PoseTheading.daemon = True
+    PoseTheading.start()
+   
+\end{lstlisting}
+
+\subsection{Comunicación vía consola}
 Si se ha configurado la comunicación con el drone usando el comando de arranque "console" entonces se puede interactuar en cualquier momento con el drone a través de una consola de texto en la cual se pueden especificar los comandos de la tabla 4.2. Esta consola se utiliza como mecanismo alternativo de comunicación con el drone, y es muy útil para depurar o recuperar un estado razonable si la comunicación desde la aplicación y el driver se ha descontrolado. Estos comandos tienen una labor de modificar la experiencia de vuelo del dron o de mostrar los valores que nos pueden proporcionar sus sensores:
 
 \begin{center}
   \label{comandos}
-  \begin{tabular}{ | l | p{10cm} |}
+  \begin{tabular}{ | l | p{11cm} |}
   \hline
   \textbf{Comando} & \textbf{Acción} \\ \hline
   reboot& Reinicia el dron\\ \hline
@@ -247,31 +271,6 @@ Si se ha configurado la comunicación con el drone usando el comando de arranque
   \end{tabular}
   \captionof{table}{Tabla de comandos de la consola}
 \end{center}
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 \section{Diálogo con las aplicaciones ICE}
 
@@ -302,9 +301,7 @@ Extra:
 
 \subsection{Inicialización}
 
-Cada hebra hace uso de su propia función donde se realiza la configuración de ICE respectiva. Allí se realiza la publicación del interfaz y es importante garantizar qué datos se envían, para que otras aplicaciones obtengan la información correctamente y garanticen la compatibilidad. El mismo procedimiento se sigue para todas las interfaces ICE con las aplicaciones.
-
-En este procedimiento, el primer paso es definir las interfaces ICE correspondientes. MAVLinkServer suministra todas las interfaces JdeRobot para el acceso de drones desde cualquier componente externo. A continuación se muestra el ejemplo de la interfaz Pose3D.
+El primer paso es definir las interfaces ICE correspondientes. MAVLinkServer suministra todas las interfaces JdeRobot para el acceso de drones desde cualquier componente externo. A continuación se muestra el ejemplo de la interfaz Pose3D.
 
 \bigskip
 \bigskip
@@ -349,9 +346,7 @@ class Pose3DI(jderobot.Pose3D):
     def getPose3DData(self, current=None):
 
         time.sleep(0.05) # 20Hz (50ms) rate to tx Pose3D
-
         lock.acquire()
-
         data = jderobot.Pose3DData()
         data.x = self.x
         data.y = self.y
@@ -367,11 +362,10 @@ class Pose3DI(jderobot.Pose3D):
         return data
 \end{lstlisting}  
 
-Esta clase hereda "jderobot.Pose3D" y se definen las funciones correspondientes. Ha sido necesario el uso de "bloqueos" (\texttt{locks}) para proteger los datos almacenados en la clase y garantizar un acceso en excusión mutua. Esto se debe a que MAVLinkServer actualiza constantemente la información provista por los sensores y también la publica constantemente a través de ICE. Esto podría causar condiciones de carrera. Con el uso de los bloqueos en las clases, la información no se puede leer mientras otra tarea esta escribiendo en ella y viceversa, asegurando la gestión correcta de la información en exclusión mutua.
+Esta clase hereda "jderobot.Pose3D" y se definen las funciones correspondientes. Ha sido necesario el uso de "bloqueos" (\texttt{locks}) para proteger los datos almacenados en la clase y garantizar un acceso en excusión mutua. Esto se debe a que MAVLinkServer actualiza constantemente la información provista por los sensores y también la publica constantemente a través de ICE. Esto podría causar condiciones de carrera. Con el uso de los bloqueos en las clases la información no se puede leer mientras otra tarea está escribiendo en ella y viceversa, asegurando la gestión correcta de la información en exclusión mutua. Estos datos Pose3D se cogen del drone vía MAVProxy (self) y se enganchan con la función que responde a las peticiones ICE (data).
 
 Las interfaces CMDVel y Extra que se muestran a continuación tienen la misma estructura que Pose3D, también con el uso de cierres.
 
-\clearpage
 \begin{lstlisting}[frame=single]
 import jderobot, time, threading
 
@@ -485,33 +479,7 @@ class ExtraI(jderobot.ArDroneExtra):
 
 \subsection{Funcionamiento continuo}
 
-En el lado de comunicación con el cuadricóptero, el driver sólo tiene una conexión con el dron a través de una IP y un puerto que se especifican en el arranque. Este bloque de MAVLinkServer está programado con tres hilos separados, uno para cada información relevante a intercambiar con el dron: posición, comandos de velocidad y comandos extra. La gestión de estos 3 hilos, respecto al único puerto abierto con el dron dron, se basa en prioridades. El hilo de comandos Extra predomina sobre los otros 2 debido a la importancia de las órdenes que envía. El segundo hilo prioritario es el que envia los comandos de velocidad. El hilo menos prioritario es el de recepción de actualizaciones de posición. 
-
-\begin{lstlisting}[frame=single]
-    mpstate.status.thread = threading.Thread(target=main_loop, 
-    						name='main_loop')
-    mpstate.status.thread.daemon = True
-    mpstate.status.thread.start()
-
-    # Open an MAVLink TX communication and 
-    # leave it open in a parallel thread
-  
-    PoseTheading = threading.Thread(target=sendCMDVel2Vehicle, 
-    				args=(PH_CMDVel,PH_Pose3D,), 
-                    name='TxCMDVel_Theading')
-    PoseTheading.daemon = True
-    PoseTheading.start()
-
-    # Open an MAVLink TX communication and 
-    # leave it open in a parallel thread
-
-    PoseTheading = threading.Thread(target=landDecision, 
-    				args=(PH_Extra,), 
-                    name='LandDecision2Vehicle_Theading')
-    PoseTheading.daemon = True
-    PoseTheading.start()
-   
-\end{lstlisting}
+Todas las comunicaciónes que se realizan mediante ICE, se administran desde tres hebras, una por cada interfaz utilizada. Cada hebra hace uso de su propia función donde se realiza la configuración de ICE respectiva. Allí se realiza la publicación del interfaz y es importante garantizar qué datos se envían, para que otras aplicaciones obtengan la información correctamente y garanticen la compatibilidad. El mismo procedimiento se sigue para todas las interfaces ICE con las aplicaciones.
 
 La conversión entre órdenes ICE y comandos MAVLink se realiza por separado en cada hebra y accede a módulos MAVProxy diferentes. A continuación se detalla la relación entre cada interfaz ICE y el módulo MAVProxy que se ve afectado:
 

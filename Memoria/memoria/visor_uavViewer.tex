@@ -5,14 +5,14 @@ información generada por un dron y con la que se puede monitorizar y controlar 
 de este vehículo. Estas estaciones pueden ser fijas o móviles y permiten al operario que maneje el dron
 conocer su estado de una manera simple.
 
-En el entorno de JdeRobot existía previamente una estación en tierra para drones desarrollada en C++ llamada UAV-Viewer. Debido a la necesidad de crear un nuevo interfaz que se asemejara más a un mando de un dron real, se decidió implementar una nueva versión. Además ha servido de validación experimental del driver MavLinkServer puesto que se comunica directamente con él para enviarle comandos de movimiento así como recibir posición del GPS.
+En el entorno de JdeRobot existía previamente una estación en tierra para drones desarrollada en C++ llamada \texttt{UAV-Viewer}. Debido a la necesidad de crear un nuevo interfaz que se asemejara más a un mando de un dron real, se decidió implementar una nueva versión. Además ha servido de validación experimental del driver \texttt{MavLinkServer} puesto que se comunica directamente con él para enviarle comandos de movimiento así como recibir posición del GPS.
 
 \section{Diseño}
 
-El desarrollo de la nueva aplicación UAV-Viewer.py se ha realizado en Python 2.7 en vez de C++ por sencillez para que el entorno JdeRobot tuviera más variedad en sus aplicaciones, en vez de hacer un cambio en la interfaz gráfica de la versión de C++. Las principales diferencias entre ambos visores son el lenguaje y el interfaz gráfico. 
+El desarrollo de la nueva aplicación \texttt{UAV-Viewer.py} se ha realizado en Python 2.7 en vez de C++ por sencillez para que el entorno JdeRobot tuviera más variedad en sus aplicaciones, en vez de hacer un cambio en la interfaz gráfica de la versión de C++. Las principales diferencias entre ambos visores son el lenguaje y el interfaz gráfico. 
 
 El diagrama de entradas y salidas del nodo UAV-Viewer.py se muestra en la Figura \ref{fig:esquemaUav}, en este caso
-conectado a dos drivers: MAVLink para conectarse con el drone y CameraServer para conectarse con
+conectado a dos drivers: MAVLink para conectarse con el drone y \texttt{CameraServer} para conectarse con
 la cámara a bordo.
 
 \begin{figure}[H]
@@ -21,53 +21,6 @@ la cámara a bordo.
   \caption{Diagrama de entradas y salidas de UAV-Viewer.py}
   \label{fig:esquemaUav}
 \end{figure}
-
-A continuación se muestra el código de inicialización de la aplicación en el cual se inicia la conexión con la biblioteca de mensajes COMM.
-
-\begin{lstlisting}[frame=single]
-		#Lectura de la configuracion
-        cfg = config.load(sys.argv[1])11
-
-        #Inicializacion de las comunicaciones
-        jdrc= comm.init(cfg, 'UAVViewer')
-
-        camera = jdrc.getCameraClient("UAVViewer.Camera")
-        navdata = jdrc.getNavdataClient("UAVViewer.Navdata")
-        pose = jdrc.getPose3dClient("UAVViewer.Pose3D")
-        cmdvel = jdrc.getCMDVelClient("UAVViewer.CMDVel")
-        extra = jdrc.getArDroneExtraClient("UAVViewer.Extra")
-
-		#Inicializacion del interfaz grafico y su hebra
-        app = QApplication(sys.argv)
-        frame = MainWindow()
-        frame.setCamera(camera)
-        frame.setNavData(navdata)
-        frame.setPose3D(pose)
-        frame.setCMDVel(cmdvel)
-        frame.setExtra(extra)
-        frame.show()
-
-
-
-        t2 = ThreadGUI(frame)
-        t2.daemon=True
-        t2.start()
-\end{lstlisting}
-
-Existen dos hebras dentro de la aplicación: una controlada por la interfaz de usuario que se encarga de enviar la información de los joysticks y los botones, la otra hebra recibe dicha información, se adecúa dependiendo el estado en el que se encuentre y envía la acción requerida.
-
-La adquisición de imágenes la realiza la hebra encargada de la comunicación con el dron dentro de un bucle de control independiente a la hebra encargada de la interfaz gráfica.  De este modo la hebra encargada de la interfaz gráfica consultará a la hebra que controla el dron periódicamente en busca de nuevas imágenes. Cuando las obtenga, refrescará la imagen que muestra en un determinado periodo de tiempo que puede ser configurado.
-
-\begin{figure}[H]
-  \centering
-  \includegraphics[scale=0.3]{imagenes/uavViewer.png}
-  \caption{Hilos Uav-Viewer.py}
-  \label{fig:uavViewer}
-\end{figure}
-
-\section{Comunicación con drivers} 
-
-Para teleoperar el dron la interfaz gráfica captura los eventos. Estos eventos son creados por los joysticks que envía una señal constante con la velocidad indicada para cada unos de los ejes. La interfaz proporcionada por además de ofrecer el envío de comandos al dron para su control, es capaz de proporcionar los datos de los sensores. A estos datos se los conoce como navdata o datos de navegación. El hilo que comunica Uav viewer con el dron hace uso de ésta interfaz para recibir dichos datos. 
 
 La herramienta se ha diseñado combinando tres bloques como se indica en la figura \ref{fig:memoriaUav}: el de configuración; el de diálogo con el drone, usando interfaces ICE; y el de diálogo con el interfaz de usuario.
 
@@ -78,12 +31,64 @@ La herramienta se ha diseñado combinando tres bloques como se indica en la figu
   \label{fig:memoriaUav}
 \end{figure}
 
-Las acciones que envía la interfaz gráfica estan marcadas por ciclos de reloj fijos, cada ciclo actualiza la información necesaria en el interfaz correspondiente. Ha sido necesario el uso de "bloqueos" (\texttt{locks}) para proteger los datos almacenados en la clase y garantizar un acceso en excusión mutua, de igual manera que se utiliza en MAVLinkServer.
+Existen dos hebras dentro de la aplicación: una que controla la interfaz de usuario que se encarga de enviar la información de los joysticks y los botones; y otra hebra que recibe dicha información, se adecúa dependiendo el estado en el que se encuentre y envía la acción requerida al driver del dron.
+
+
+\section{Comunicación con los drivers} 
+
+
+La biblioteca COMM permite comunicación tanto vía ICE como ROS. Todas las comunicaciónes que se realizan mediante COMM, se administran desde dos hebras, una para realizar la comunicación con el drone y la otra administra el interfaz de usuario. Las interfaces ICE suministran todas las utilidades para el acceso a drones desde cualquier componente externo. Estas interfaces permiten acceder a todos los datos sensoriales o actuadores de los drones.
+
+Para teleoperar el dron la interfaz gráfica captura los eventos. Estos eventos son creados por los joysticks que envía una señal constante con la velocidad indicada para cada unos de los ejes. La interfaz proporcionada además de ofrecer el envío de comandos al dron para su control, es capaz de proporcionar los datos de los sensores. A estos datos se los conoce como navdata o datos de navegación. El hilo que comunica Uav viewer con el dron hace uso de ésta interfaz para recibir dichos datos. A continuación se muestra el código de inicialización de la aplicación en el cual se inicia la conexión con la biblioteca de mensajes COMM:
+
+\begin{lstlisting}[frame=single]
+		#Lectura de la configuracion
+        cfg = config.load(sys.argv[1])
+
+        #Inicializacion de las comunicaciones
+        jdrc= comm.init(cfg, 'UAVViewer')
+
+        camera = jdrc.getCameraClient("UAVViewer.Camera")
+        navdata = jdrc.getNavdataClient("UAVViewer.Navdata")
+        pose = jdrc.getPose3dClient("UAVViewer.Pose3D")
+        cmdvel = jdrc.getCMDVelClient("UAVViewer.CMDVel")
+        extra = jdrc.getArDroneExtraClient("UAVViewer.Extra")
+\end{lstlisting}
+
+La adquisición de imágenes la realiza la hebra encargada de la comunicación con el dron dentro de un bucle de control independiente a la hebra encargada de la interfaz gráfica.  De este modo la hebra encargada de la interfaz gráfica consultará a la hebra que controla el dron periódicamente en busca de nuevas imágenes. Cuando las obtenga, refrescará la imagen que muestra en un determinado periodo de tiempo que puede ser configurado.
+
+\begin{figure}[H]
+  \centering
+  \includegraphics[scale=0.3]{imagenes/uavViewer.png}
+  \caption{Arquitectura software de dos Hilos en Uav-Viewer.py}
+  \label{fig:uavViewer}
+\end{figure}
+
+Las acciones que envía la interfaz gráfica estan marcadas por ciclos de reloj fijos, cada ciclo actualiza la información necesaria en el interfaz correspondiente. Ha sido necesario el uso de "bloqueos" (\texttt{locks}) para proteger los datos almacenados en la clase y garantizar un acceso en excusión mutua, de igual manera que se utiliza en MAVLinkServer. Toda la memoria compartida se administra desde las clases correspondientes y cada interfaz se ocupa de recibir los datos de la interfaz de usuario.
 
 \section{Interfaz Gráfica}
 
-La aplicación ha sido desarrollada en python utilizando para el apartado gráfico la librería
-para interfaces de usuario Qt. Se ha dividido en tres ventanas: la figura \ref{fig:interfazUavViewer} corresponde a la ventana principal, donde se teleopera el dron. La segunda ventana representa la imagen en tiempo real de la cámara a bordo del dron. Por último, la tercera ventana muestra la información recogida por los sensores del dron, mostrado en la figura \ref{fig:sensores}. A continuación, se describirán las funciones que realiza cada ventana:
+La aplicación ha sido desarrollada en Python utilizando para el apartado gráfico la librería
+para interfaces de usuario Qt. Se ha dividido en tres ventanas: la figura \ref{fig:interfazUavViewer} corresponde a la ventana principal, donde se teleopera el dron. La segunda ventana representada en la figura \ref{fig:cameraView}, se corresponde con la imagen en tiempo real de la cámara a bordo del dron. Por último, la tercera ventana muestra la información recogida por los sensores del dron, mostrado en la figura \ref{fig:sensores}. 
+
+
+A continuación se muestra el código de inicialización de la interfaz de usuario junto a las conexiones COMM levantadas anteriormente:
+
+\begin{lstlisting}[frame=single]
+		#Inicializacion del interfaz grafico y su hebra
+        app = QApplication(sys.argv)
+        frame = MainWindow()
+        frame.setCamera(camera)
+        frame.setNavData(navdata)
+        frame.setPose3D(pose)
+        frame.setCMDVel(cmdvel)
+        frame.setExtra(extra)
+        frame.show()
+
+        t2 = ThreadGUI(frame)
+        t2.daemon=True
+        t2.start()
+\end{lstlisting}
 
 La ventana principal se ha realizado de tal manera que se asemeje lo más posible a los mandos de los drones físicos. Las crucetas simulan los joystick de control del dron, de tal forma que el joystick izquierdo controla la altura y el giro (o Yaw), y el joystick derecho controla los ejes X e Y. 
 
@@ -187,18 +192,31 @@ Extra:
 \end{lstlisting}
 
 \section{Experimentos}
-Para cumplir con todos los requerimientos que pueden ser necesarios para la plataforma de JdeRobot, el visor que se ha desarrollado se ha validado con el 3DR Solo Drone.
 
-Las primeras pruebas que se realizaron como se muestra en la figura \ref{fig:experimentoConUAV}\footnote{\url{https://www.youtube.com/watch?v=j5P7QywcFHk}} para validar el funcionamiento de la herramienta, fueron la realización de movimientos de traslación relativos, como puede ser avance o retroceso, ascenso o descenso, desplazamiento lateral en cualquier dirección y velocidades angulares (guiñada, alabeo, cabeceo).
+Tanto el driver \texttt{MAVLinkServer} como el visor \texttt{UAV-Viewer.py} que se han desarrollado se han validado con el 3DR Solo Drone real.
+
+Las primeras pruebas que se realizaron para validar el funcionamiento de la herramienta y el driver, fueron la realización de movimientos de traslación relativos, como el avance o retroceso, ascenso o descenso, desplazamiento lateral en cualquier dirección y velocidades angulares (guiñada, alabeo, cabeceo). Se muestran en la figura \ref{fig:experimentoConUAV} y también en el video \url{https://www.youtube.com/watch?v=j5P7QywcFHk}.
 \begin{figure}[H]
   \centering
   \includegraphics[scale=0.25]{imagenes/EXP1.png}
   \caption{Captación de movimientos del drone}
   \label{fig:experimentoConUAV}
 \end{figure}
-A continuación se implementó el sistema de aterrizaje y despegue. Para ello, se probó tanto en sitios abiertos como cerrados, pudiendo estudiar el efecto de las condiciones climáticas y las turbulencias generadas, sobre la actuación del dron.
 
-Por último, se realizó una validación de los comandos de velocidad en dos pasos: el primero de ellos era comproborar que las órdenes que se enviaban, se recibían correctamente en el drone, para evitar accidentes; el segundo, como se ilustra en la figura \ref{fig:experimentoConjunto}\footnote{\url{https://www.youtube.com/watch?v=UtUWMH6s2Yk}}, consistía en probar el comportamiento de estos comandos en pleno vuelo para tomar medidas y a continuación realizar ajustes.   
+Se comprobó que los datos sensoriales IMU abordo (que van vía pose3D) son recogidos correctamente por el driver y mostrados adecuadamente en la interfaz gráfica del teleoperador. 
+
+El desarrollo completo de todos los interfaces ICE de la herramienta se comenzó a validar en el simulador Gazebo con un drone simulado como se muestra en la figura \ref{fig:experimentoConUAVsimulado}. 
+
+\begin{figure}[H]
+  \centering
+  \includegraphics[scale=0.25]{imagenes/GAZEBO.png}
+  \caption{Experimento de vuelo simulado}
+  \label{fig:experimentoConUAVsimulado}
+\end{figure}
+
+A continuación se implementó el sistema de aterrizaje y despegue. Para ello, se probó tanto en sitios abiertos como cerrados, pudiendo estudiar el efecto de las condiciones climáticas y las turbulencias generadas sobre la actuación del dron.
+
+Por último, se realizó una validación de los comandos de velocidad en dos pasos: el primero de ellos era comproborar que las órdenes que se enviaban y se recibían correctamente en el drone real; el segundo, como se ilustra en la figura \ref{fig:experimentoConjunto} y en el video \url{https://www.youtube.com/watch?v=UtUWMH6s2Yk}, consistía en probar el comportamiento de estos comandos en pleno vuelo para tomar medidas y a continuación realizar ajustes.   
 
 \begin{figure}[H]
   \centering
@@ -206,3 +224,5 @@ Por último, se realizó una validación de los comandos de velocidad en dos pas
   \caption{Experimento de vuelo real}
   \label{fig:experimentoConjunto}
 \end{figure}
+
+En este experimento se validaron las órdenes de aterrizaje y despegue, y fundamentalmente el funcionamiento correcto de las órdenes relativas de movimiento: desplazamientos laterales, desplazamientos frontales, desplazamientos verticales y giro alrededor de la vertical (yaw).
