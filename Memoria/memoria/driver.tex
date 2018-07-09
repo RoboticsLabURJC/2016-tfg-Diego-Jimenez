@@ -474,10 +474,11 @@ sys.exit(status)
 
 \subsection{Funcionamiento continuo}
 
-A continuación se muestra el ejemplo de la interfaz Pose3D.
+Todas las comunicaciónes que se realizan mediante ICE se administran desde tres hebras, una por cada interfaz utilizada. Cada hebra hace uso de su propia función donde se realiza la configuración de ICE respectiva. Allí se realiza la publicación del interfaz y es importante garantizar qué datos se envían, para que otras aplicaciones obtengan la información correctamente y garanticen la compatibilidad. El mismo procedimiento se sigue para todas las interfaces ICE con las aplicaciones.
 
-\bigskip
-\bigskip
+La conversión entre órdenes ICE y comandos MAVLink se realiza por separado en cada hebra y accede a módulos \texttt{MAVProxy} diferentes.
+
+A continuación se muestra el ejemplo de la interfaz Pose3D:
 
 \begin{lstlisting}[frame=single]
 import jderobot, time, threading
@@ -535,6 +536,7 @@ class Pose3DI(jderobot.Pose3D):
         return data
 \end{lstlisting}  
 
+\clearpage
 Esta clase hereda "jderobot.Pose3D" y se definen las funciones correspondientes. Ha sido necesario el uso de "bloqueos" (\texttt{locks}) para proteger los datos almacenados en la clase y garantizar un acceso en excusión mutua. Esto se debe a que \texttt{MAVLinkServer} actualiza constantemente la información provista por los sensores y también la publica constantemente a través de ICE. Esto podría causar condiciones de carrera. Con el uso de los bloqueos en las clases la información no se puede leer mientras otra tarea está escribiendo en ella y viceversa, asegurando la gestión correcta de la información en exclusión mutua. Estos datos Pose3D se cogen del drone vía \texttt{MAVProxy} (self) y se enganchan con la función que responde a las peticiones ICE (data).
 
 Las interfaces \texttt{CMDVel} y \texttt{Extra} que se muestran a continuación tienen la misma estructura que \texttt{Pose3D}, también con el uso de cierres.
@@ -649,7 +651,3 @@ class ExtraI(jderobot.ArDroneExtra):
         return 0
 
 \end{lstlisting}  
-
-Todas las comunicaciónes que se realizan mediante ICE, se administran desde tres hebras, una por cada interfaz utilizada. Cada hebra hace uso de su propia función donde se realiza la configuración de ICE respectiva. Allí se realiza la publicación del interfaz y es importante garantizar qué datos se envían, para que otras aplicaciones obtengan la información correctamente y garanticen la compatibilidad. El mismo procedimiento se sigue para todas las interfaces ICE con las aplicaciones.
-
-La conversión entre órdenes ICE y comandos MAVLink se realiza por separado en cada hebra y accede a módulos \texttt{MAVProxy} diferentes.
