@@ -11,7 +11,7 @@ En el entorno de JdeRobot existía previamente una estación en tierra para dron
 
 El desarrollo de la nueva aplicación \texttt{UAV-Viewer.py} se ha realizado en Python 2.7 en vez de C++ por sencillez para que el entorno JdeRobot tuviera más variedad en sus aplicaciones, en vez de hacer un cambio en la interfaz gráfica de la versión de C++. Las principales diferencias entre ambos visores son el lenguaje y el interfaz gráfico. 
 
-El diagrama de entradas y salidas del nodo UAV-Viewer.py se muestra en la Figura \ref{fig:esquemaUav}, en este caso
+El diagrama de entradas y salidas del nodo \texttt{UAV-Viewer.py} se muestra en la Figura \ref{fig:esquemaUav}, en este caso
 conectado a dos drivers: MAVLink para conectarse con el drone y \texttt{CameraServer} para conectarse con
 la cámara a bordo.
 
@@ -39,7 +39,7 @@ Existen dos hebras dentro de la aplicación: una que controla la interfaz de usu
 
 La biblioteca COMM permite comunicación tanto vía ICE como ROS. Todas las comunicaciónes que se realizan mediante COMM, se administran desde dos hebras, una para realizar la comunicación con el drone y la otra administra el interfaz de usuario. Las interfaces ICE suministran todas las utilidades para el acceso a drones desde cualquier componente externo. Estas interfaces permiten acceder a todos los datos sensoriales o actuadores de los drones.
 
-Para teleoperar el dron la interfaz gráfica captura los eventos. Estos eventos son creados por los joysticks que envía una señal constante con la velocidad indicada para cada unos de los ejes. La interfaz proporcionada además de ofrecer el envío de comandos al dron para su control, es capaz de proporcionar los datos de los sensores. A estos datos se los conoce como navdata o datos de navegación. El hilo que comunica Uav viewer con el dron hace uso de ésta interfaz para recibir dichos datos. A continuación se muestra el código de inicialización de la aplicación en el cual se inicia la conexión con la biblioteca de mensajes COMM:
+Para teleoperar el dron la interfaz gráfica captura los eventos. Estos eventos son creados por los joysticks que envía una señal constante con la velocidad indicada para cada unos de los ejes. La interfaz proporcionada además de ofrecer el envío de comandos al dron para su control, es capaz de proporcionar los datos de los sensores. A estos datos se los conoce como navdata o datos de navegación. El hilo que comunica \texttt{UAV-Viewer.py} con el dron hace uso de ésta interfaz para recibir dichos datos. A continuación se muestra el código de inicialización de la aplicación en el cual se inicia la conexión con la biblioteca de mensajes COMM:
 
 \begin{lstlisting}[frame=single]
 		#Lectura de la configuracion
@@ -136,12 +136,12 @@ A su vez, esta ventana dispone de tres botones:
         self.reset = False
 \end{lstlisting}
 
-Además de esta ventana principal, la aplicación desarrollada también implementa la visualización de cámara y de los sensores a bordo. Obtiene las imágenes a través de la interfaz camera. Con la imagen y los metadatos de ésta recuperados desde el driver que suministra las imágenes, UAV-viewer.py la transforma en una imagen compatible con Qt. En función de la cámara activa el tamaño de la ventana donde se muestran las imágenes cambiará para ajustarse al ancho y alto de la imagen obtenida.
+Además de esta ventana principal, la aplicación desarrollada también implementa la visualización de cámara y de los sensores a bordo. Obtiene las imágenes a través de la interfaz camera. Con la imagen y los metadatos de ésta recuperados desde el driver que suministra las imágenes, \texttt{UAV-Viewer.py} la transforma en una imagen compatible con Qt. En función de la cámara activa el tamaño de la ventana donde se muestran las imágenes cambiará para ajustarse al ancho y alto de la imagen obtenida.
 
 \begin{figure}[H]
   \centering
   \includegraphics[scale=0.4]{imagenes/cameraView.png}
-  \caption{Interfaz gráfico de uav-viewer.py para mostrar la cámara}
+  \caption{Interfaz gráfico de UAV-Viewer.py para mostrar la cámara}
   \label{fig:cameraView}
 \end{figure}
 
@@ -150,13 +150,13 @@ En la figura \ref{fig:sensores} se puede apreciar cómo el hilo que gestiona la 
 \begin{figure}[H]
   \centering
   \includegraphics[scale=0.4]{imagenes/sensores.png}
-  \caption{Interfaz gráfico de uav-viewer.py para mostrar los sensores}
+  \caption{Interfaz gráfico de UAV-Viewer.py para mostrar los sensores}
   \label{fig:sensores}
 \end{figure}
 
 \section{Fichero de configuración}
 
-La aplicación UAV-Viewer.py utiliza ficheros de configuración YAML. A continuación se muestra el fichero de configuración en el cuál se determinan en qué puertos específicos se comunica con los drivers, MAVLinkServer y cameraServer para intercambiar datos sensoriales y órdenes de control.
+La aplicación \texttt{UAV-Viewer.py} utiliza ficheros de configuración YAML. A continuación se muestra el fichero de configuración en el cuál se determinan en qué puertos específicos se comunica con los drivers, \texttt{MAVLinkServer} y \texttt{CameraServer} para intercambiar datos sensoriales y órdenes de control.
 
 \begin{lstlisting}[frame=single]
 Camera:
@@ -195,7 +195,7 @@ Extra:
 
 Tanto el driver \texttt{MAVLinkServer} como el visor \texttt{UAV-Viewer.py} que se han desarrollado se han validado con el 3DR Solo Drone real.
 
-Las primeras pruebas que se realizaron para validar el funcionamiento de la herramienta y el driver, fueron la realización de movimientos de traslación relativos, como el avance o retroceso, ascenso o descenso, desplazamiento lateral en cualquier dirección y velocidades angulares (guiñada, alabeo, cabeceo). Se muestran en la figura \ref{fig:experimentoConUAV} y también en el video \url{https://www.youtube.com/watch?v=j5P7QywcFHk}.
+Las primeras pruebas que se realizaron para validar el funcionamiento de la herramienta y el driver fueron la realización de movimientos de traslación relativos, como el avance o retroceso, ascenso o descenso, desplazamiento lateral en cualquier dirección y velocidades angulares (guiñada, alabeo, cabeceo). Se muestran en la figura \ref{fig:experimentoConUAV} y también en el video \url{https://www.youtube.com/watch?v=j5P7QywcFHk}. Se comprobó que los datos sensoriales IMU abordo (que van vía \texttt{Pose3D}) son recogidos correctamente por el driver y mostrados adecuadamente en la interfaz gráfica del teleoperador. 
 \begin{figure}[H]
   \centering
   \includegraphics[scale=0.25]{imagenes/EXP1.png}
@@ -203,9 +203,7 @@ Las primeras pruebas que se realizaron para validar el funcionamiento de la herr
   \label{fig:experimentoConUAV}
 \end{figure}
 
-Se comprobó que los datos sensoriales IMU abordo (que van vía pose3D) son recogidos correctamente por el driver y mostrados adecuadamente en la interfaz gráfica del teleoperador. 
-
-El desarrollo completo de todos los interfaces ICE de la herramienta se comenzó a validar en el simulador Gazebo con un drone simulado como se muestra en la figura \ref{fig:experimentoConUAVsimulado}. 
+El desarrollo completo de todos los interfaces ICE de la herramienta se verificó experimentalmente en el simulador \texttt{Gazebo} con un drone simulado como se muestra en la figura \ref{fig:experimentoConUAVsimulado}. 
 
 \begin{figure}[H]
   \centering
@@ -214,9 +212,7 @@ El desarrollo completo de todos los interfaces ICE de la herramienta se comenzó
   \label{fig:experimentoConUAVsimulado}
 \end{figure}
 
-A continuación se implementó el sistema de aterrizaje y despegue. Para ello, se probó tanto en sitios abiertos como cerrados, pudiendo estudiar el efecto de las condiciones climáticas y las turbulencias generadas sobre la actuación del dron.
-
-Por último, se realizó una validación de los comandos de velocidad en dos pasos: el primero de ellos era comproborar que las órdenes que se enviaban y se recibían correctamente en el drone real; el segundo, como se ilustra en la figura \ref{fig:experimentoConjunto} y en el video \url{https://www.youtube.com/watch?v=UtUWMH6s2Yk}, consistía en probar el comportamiento de estos comandos en pleno vuelo para tomar medidas y a continuación realizar ajustes.   
+A continuación se validaron las órdenes de aterrizaje y despegue. Para ello, se probó tanto en sitios abiertos como cerrados, pudiendo estudiar el efecto de las condiciones climáticas y las turbulencias generadas sobre la actuación del dron. Por último, se realizó una validación de los comandos de velocidad en dos pasos: el primero de ellos era comproborar que las órdenes que se enviaban y se recibían correctamente en el drone real; el segundo, como se ilustra en la figura \ref{fig:experimentoConjunto} y en el video \url{https://www.youtube.com/watch?v=UtUWMH6s2Yk}, consistía en probar el comportamiento de estos comandos en pleno vuelo para tomar medidas y a continuación realizar ajustes.   
 
 \begin{figure}[H]
   \centering
@@ -225,4 +221,4 @@ Por último, se realizó una validación de los comandos de velocidad en dos pas
   \label{fig:experimentoConjunto}
 \end{figure}
 
-En este experimento se validaron las órdenes de aterrizaje y despegue, y fundamentalmente el funcionamiento correcto de las órdenes relativas de movimiento: desplazamientos laterales, desplazamientos frontales, desplazamientos verticales y giro alrededor de la vertical (yaw).
+En este experimento se verificaron las órdenes de aterrizaje y despegue, y sobre todo el funcionamiento correcto de las órdenes relativas de movimiento: desplazamientos laterales, desplazamientos frontales, desplazamientos verticales y giro alrededor de la vertical (yaw).
